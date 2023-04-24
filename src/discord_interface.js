@@ -39,8 +39,14 @@ function print_achievement(a,users,channel,API_Steam_key){
         ]).then(() => {
           const decal = 160
           context.drawImage(a.user.avatar, decal, 140, 32, 32);
-          a['u_by'].map(async (user,i) => {
-            context.drawImage(user.avatar, decal+40*(i+1), 140, 32, 32);
+          var i = 0
+          a['u_by'].map(async (user) => {
+            console.log(channel.guild.id)
+            console.log(user.guilds)
+            if(user.guilds.includes(channel.guild.id)){
+              context.drawImage(user.avatar, decal+40*(i+1), 140, 32, 32);
+              i = i + 1;
+            }
           })
           
           context.font = '30px "Open Sans Regular"';
@@ -57,7 +63,7 @@ function print_achievement(a,users,channel,API_Steam_key){
           const txt2_1 = "Unlocked by ";
           const txt2_2 = "and by " + a.percent + " % of players.";
           context.fillText(txt2_1, 25, 165);
-          context.fillText(txt2_2, decal+(a['u_by'].length+1)*40, 165);
+          context.fillText(txt2_2, decal+(i+1)*40, 165);
       
           attachment = new MessageAttachment(canvas.toBuffer())
       })
