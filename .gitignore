@@ -1,2 +1,4 @@
 node_modules
 config/config.js
+config/users.csv
+config/games.csv
