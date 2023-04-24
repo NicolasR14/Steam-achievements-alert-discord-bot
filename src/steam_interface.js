@@ -132,7 +132,7 @@ async function get_achievements_to_print(
           if (
             a.unlocktime != 0 &&
             a.unlocktime > t_0 &&
-            !user.a_dis.includes(a.apiname + user.steam_id)
+            !user.a_dis.includes(a.apiname + user.steam_id + game.appid)
           ) {
             //achievement is valid if it has been unlocked since bot is live and if it has not been displayed
             var a_valid = {
@@ -145,7 +145,7 @@ async function get_achievements_to_print(
               user: user,
             };
             achievements_list.push(a_valid); //add to achievements list to display
-            user.a_dis.push(a.apiname + user.steam_id); //add to achievements list displayed (by user)
+            user.a_dis.push(a.apiname + user.steam_id + game.appid); //add to achievements list displayed (by user)
           }
         }
         n++;

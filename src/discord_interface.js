@@ -18,63 +18,58 @@ const forwardButton = new MessageButton({
   customId: forwardId
 })
 
-function print_achievement(a,users,channel,API_Steam_key){
-    const to_print = a.user.discord_id + " unlocked an achievement on " + a.Name_game +". Progress : ("+a['rate_unlocked']+")";
-    is_unlocked_for_others(a,API_Steam_key,users)
-    .then(async function(){
-        Canvas.registerFont('./assets/OpenSans-VariableFont_wdth,wght.ttf', { family: 'Open Sans Regular' })
-        const canvas = Canvas.createCanvas(700, 190);
-        const context = canvas.getContext('2d');
-        var attachment;
-        await Promise.all([
-          Canvas.loadImage('./assets/background.jpg')
-          .then(function(img){
-            context.drawImage(img, 0, 0);
-          }),
-          Canvas.loadImage(a.icon)
-          .then(function(img){
-            context.drawImage(img, 25, 25, 100, 100);
-          }),
-          
-        ]).then(() => {
-          const decal = 160
-          context.drawImage(a.user.avatar, decal, 140, 32, 32);
-          var i = 0
-          a['u_by'].map(async (user) => {
-            console.log(channel.guild.id)
-            console.log(user.guilds)
-            if(user.guilds.includes(channel.guild.id)){
-              context.drawImage(user.avatar, decal+40*(i+1), 140, 32, 32);
-              i = i + 1;
-            }
-          })
-          
-          context.font = '30px "Open Sans Regular"';
-          context.fillStyle = '#ffffff';
-          context.fillText(a.a_name, 150, 45);
-      
-          context.font = '20px "Open Sans Regular"';
-          context.fillStyle = '#bfbfbf';
-          const width_max = 100;
-          printAtWordWrap(context, a.a_descri, 150, 72, 20, 525)
-      
-          context.font = '22px "Open Sans Regular"';
-          context.fillStyle = '#ffffff';
-          const txt2_1 = "Unlocked by ";
-          const txt2_2 = "and by " + a.percent + " % of players.";
-          context.fillText(txt2_1, 25, 165);
-          context.fillText(txt2_2, decal+(i+1)*40, 165);
-      
-          attachment = new MessageAttachment(canvas.toBuffer())
-      })
-      .then(function(){
-        channel.send(to_print);
-        channel.send({ files: [attachment] })
-      })
+async function print_achievement(a,users,channel,API_Steam_key){
+  const to_print = a.user.discord_id + " unlocked an achievement on " + a.Name_game +". Progress : ("+a['rate_unlocked']+")";
+  Canvas.registerFont('./assets/OpenSans-VariableFont_wdth,wght.ttf', { family: 'Open Sans Regular' })
+  const canvas = Canvas.createCanvas(700, 190);
+  const context = canvas.getContext('2d');
+  var attachment;
+  await Promise.all([
+    Canvas.loadImage('./assets/background.jpg')
+    .then(function(img){
+      context.drawImage(img, 0, 0);
+    }),
+    Canvas.loadImage(a.icon)
+    .then(function(img){
+      context.drawImage(img, 25, 25, 100, 100);
+    }),
+    
+  ]).then(() => {
+    const decal = 160
+    context.drawImage(a.user.avatar, decal, 140, 32, 32);
+    var i = 0
+    a['u_by'].map(async (user) => {
+      if(user.guilds.includes(channel.guild.id)){
+        context.drawImage(user.avatar, decal+40*(i+1), 140, 32, 32);
+        i = i + 1;
+      }
     })
-    .catch(function(err) {
-      console.error(err);
-    })
+    
+    context.font = '30px "Open Sans Regular"';
+    context.fillStyle = '#ffffff';
+    context.fillText(a.a_name, 150, 45);
+
+    context.font = '20px "Open Sans Regular"';
+    context.fillStyle = '#bfbfbf';
+    const width_max = 100;
+    printAtWordWrap(context, a.a_descri, 150, 72, 20, 525)
+
+    context.font = '22px "Open Sans Regular"';
+    context.fillStyle = '#ffffff';
+    const txt2_1 = "Unlocked by ";
+    const txt2_2 = "and by " + a.percent + " % of players.";
+    context.fillText(txt2_1, 25, 165);
+    context.fillText(txt2_2, decal+(i+1)*40, 165);
+
+    attachment = new MessageAttachment(canvas.toBuffer())
+  })
+  .then(function(){
+    channel.send(to_print);
+    channel.send({ files: [attachment] })
+  })
+  .catch(function(err) {
+    console.error(err);
+  })
     
   }
 
@@ -333,20 +328,19 @@ function listen_achievements(guilds,users,games,API_Steam_key,t_0){
                 if(achievements.length != 0){
                   const eligible_guilds = guilds.filter(g=> user.guilds.includes(g.id) && typeof g.channel_id != 'undefined')
                   if (eligible_guilds.length != 0){
-                    const channels_ids = eligible_guilds.map(g => g.channel)
-                    channels_ids.forEach(function(channel){
-                      achievements.forEach(a =>print_achievement(a,users,channel,API_Steam_key))
-                  });
+                      await Promise.all(achievements.map(a => is_unlocked_for_others(a,API_Steam_key,users)))
+                      const channels_ids = eligible_guilds.map(g => g.channel)
+                      channels_ids.forEach(function(channel){
+                        achievements.forEach(a =>print_achievement(a,users,channel,API_Steam_key))
+                    })
+                }}});
                   }
-                }
-              })}
-        });
-      }
+                })
+              }
       else {
         console.log("No recently played games for "+user)
       }
-      
-    })
+            })
     .catch(function(err) {
       console.error(err);
     })

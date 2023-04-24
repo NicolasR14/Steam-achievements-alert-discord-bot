@@ -5,8 +5,8 @@ import {get_games_users_dict,add_game,add_user,remove_user,remove_game} from './
 import {config} from './config/config.js'
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS,Intents.FLAGS.DIRECT_MESSAGES,Intents.FLAGS.GUILD_MESSAGES,Intents.FLAGS.GUILDS] });
-// const t_0 = parseInt(Date.now()/1000);
-const t_0 = parseInt(1682368647000/1000);
+const t_0 = parseInt(Date.now()/1000);
+// const t_0 = parseInt(1682368647000/1000);
 const token = config.discord_token //Discord bot token
 
 const API_Steam_key = config.API_Steam_key //Steam API key
