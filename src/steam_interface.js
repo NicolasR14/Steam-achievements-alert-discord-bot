@@ -37,7 +37,6 @@ async function get_avatars(API_Steam_key, users) {
 async function is_unlocked_for_others(a, API_Steam_key, users) {
   a["u_by"] = []; //users list who unlocked
   const o_users = users.filter(f => f!=a.user); //list of users without the one who unlocked the achievement
-
   await Promise.all(
     o_users.map(async (user) => {
       const contents = await fetch(
@@ -55,7 +54,7 @@ async function is_unlocked_for_others(a, API_Steam_key, users) {
         .then(function (value) {
           if (value.playerstats.success) {
             if (value.playerstats.achievements[a.a_n]["achieved"] == 1) {
-              a["u_by"].push(user.steam_id);
+              a["u_by"].push(user);
             }
           }
         })

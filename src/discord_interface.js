@@ -40,7 +40,7 @@ function print_achievement(a,users,channel,API_Steam_key){
           const decal = 160
           context.drawImage(a.user.avatar, decal, 140, 32, 32);
           a['u_by'].map(async (user,i) => {
-            context.drawImage(a.user.avatar, decal+40*(i+1), 140, 32, 32);
+            context.drawImage(user.avatar, decal+40*(i+1), 140, 32, 32);
           })
           
           context.font = '30px "Open Sans Regular"';
