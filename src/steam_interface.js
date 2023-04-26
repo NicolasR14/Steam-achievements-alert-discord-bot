@@ -167,15 +167,14 @@ async function get_achievements_to_print(
             ]);
           })
         );
-        console.log('a1')
         return achievements_list;
       } else {
-        console.log('a1')
         return [];
       }
     })
     .catch(function (err) {
       console.error("get_achievements_to_print error : ", err);
+      return [];
     });
 }
 
