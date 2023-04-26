@@ -326,7 +326,7 @@ function listen_achievements(guilds,users,games,API_Steam_key,t_0){
             get_achievements_to_print(user,API_Steam_key,g_u,t_0,users)
               .then(async function(achievements){
                 if(achievements.length != 0){
-                  const eligible_guilds = guilds.filter(g=> user.guilds.includes(g.id) && typeof g.channel_id != 'undefined')
+                  const eligible_guilds = guilds.filter(g=> user.guilds.includes(g.id) && games.find(game => game.id === g_u.appid).guilds.includes(g.id) && typeof g.channel_id != 'undefined')
                   if (eligible_guilds.length != 0){
                       await Promise.all(achievements.map(a => is_unlocked_for_others(a,API_Steam_key,users)))
                       const channels_ids = eligible_guilds.map(g => g.channel)

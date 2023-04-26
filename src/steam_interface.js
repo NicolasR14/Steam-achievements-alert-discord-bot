@@ -96,8 +96,8 @@ async function get_achievements_to_print(
   t_0
 ) {
   const now = parseInt(Date.now());
-
-  const achievements_to_print = await fetch(
+  var achievements_to_print = []
+  achievements_to_print = await fetch(
     "http://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v0001/?appid=" +
       game.appid +
       "&key=" +
@@ -167,12 +167,17 @@ async function get_achievements_to_print(
             ]);
           })
         );
+        console.log('a1')
         return achievements_list;
-      } else return [];
+      } else {
+        console.log('a1')
+        return [];
+      }
     })
     .catch(function (err) {
       
     });
+  console.log('a2')
   return achievements_to_print;
 }
 
