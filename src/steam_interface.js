@@ -96,8 +96,8 @@ async function get_achievements_to_print(
   t_0
 ) {
   const now = parseInt(Date.now());
-  var achievements_to_print = []
-  achievements_to_print = await fetch(
+  // var achievements_to_print = []
+  return await fetch(
     "http://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v0001/?appid=" +
       game.appid +
       "&key=" +
@@ -175,10 +175,8 @@ async function get_achievements_to_print(
       }
     })
     .catch(function (err) {
-      
+      console.error("get_achievements_to_print error : ", err);
     });
-  console.log('a2')
-  return achievements_to_print;
 }
 
 async function get_schema_for_game(achievement_unlocked, API_Steam_key) {
