@@ -1,6 +1,7 @@
 import { string } from "mathjs";
 import Canvas from "canvas";
 import fetch from "node-fetch";
+// import { language } from "config.js"
 import { print_compare, neverPlayed } from "./discord_out.js";
 //load steam profile pictures
 async function get_avatars(API_Steam_key, users) {
@@ -149,7 +150,7 @@ async function get_achievements_to_print(
       API_Steam_key +
       "&steamid=" +
       user.steam_id +
-      "&l=en"
+      "&l=french"
   )
     .then(function (res) {
       if (res.ok) {
@@ -304,7 +305,7 @@ async function compare(
           API_Steam_key +
           "&steamid=" +
           user.steam_id +
-          "&l=en"
+          "&l=french"
       )
         .then(function (res) {
           return res.json();

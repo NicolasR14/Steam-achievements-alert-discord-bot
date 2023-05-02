@@ -1,96 +1,109 @@
-import {is_unlocked_for_others, get_recently_played_games, get_achievements_to_print, compare} from './steam_in.js'
-import { MessageAttachment , MessageEmbed,MessageActionRow, MessageButton} from 'discord.js';
-import Canvas from 'canvas';
-import {typeOf} from "mathjs";
-import fs from 'fs';
+import {compare} from './steam_in.js'
 
-function new_game(correct,channel_id){
-  if (correct === 1){
-    channel_id.send('Game added!');
+function new_game(code,channel_id){
+  switch(code){
+    case 1:
+      err_msg='Game added!'
+      break;
+    case 0:
+      err_msg='Wrong format. Please use : !addgame [game_name] [game_id]'
+      break;
+    case 2:
+      err_msg='Game was already added'
+      break;
+    case 3:
+      err_msg='Wrong ID'
+      break;
+    default:
+      err_msg='Wrong format'
   }
-  else if(correct === 0){
-    channel_id.send('Wrong format. Please use : !addgame [game_name] [game_id]');
-  }
-  else if(correct === 2){
-    channel_id.send('Game was already added');
-  }
-  else if(correct === 3){
-    channel_id.send('Wrong ID')
-  }
+  channel_id.send(err_msg)
 
 }
 
-function new_player(correct,channel_id){
-  if (correct === 1){
-    channel_id.send('Player added!');
+function new_player(code,channel_id){
+  switch(code){
+    case 1:
+      err_msg='Player added!'
+      break;
+    case 0:
+      err_msg='Wrong format. Please use : *!addplayer @player [steam_user_id] [nickname]*'
+      break;
+    case 2:
+      err_msg='Player was already added'
+      break;
+    case 3:
+      err_msg='Wrong ID'
+      break;
+    default:
+      err_msg='Wrong format'
   }
-  else if(correct === 0){
-    channel_id.send('Wrong format. Please use : *!addplayer @player [steam_user_id] [nickname]*');
-  }
-  else if(correct === 2){
-    channel_id.send('Player was already added');
-  }
-  else if(correct === 3){
-    channel_id.send('Wrong ID')
-  }
+  channel_id.send(err_msg);
 }
 
 function del_player(correct,channel_id){
-  if (correct === 1){
-    channel_id.send('Player removed!');
+  switch(code){
+    case 1:
+      err_msg='Player removed!'
+      break;
+    case 0:
+      err_msg='Wrong format. Please use : *!removeplayer @player*'
+      break;
+    case 2:
+      err_msg='Player not found'
+      break;
+    default:
+      err_msg='Wrong format'
   }
-  else if(correct === 0){
-    channel_id.send('Wrong format. Please use : *!removeplayer @player*');
-  }
-  else if(correct === 2){
-    channel_id.send('Player not found');
-  }
+  channel_id.send(err_msg);
 
 }
 
 function del_game(correct,channel_id){
-  if (correct === 1){
-    channel_id.send('Game removed!');
+  switch(code){
+    case 1:
+      err_msg='Game removed!'
+      break;
+    case 0:
+      err_msg='Wrong format. Please use : *!removegame game_name*'
+      break;
+    case 2:
+      err_msg='Game not found'
+      break;
+    default:
+      err_msg='Wrong format'
   }
-  else if(correct === 0){
-    channel_id.send('Wrong format. Please use : *!removegame game_name*');
-  }
-  else if(correct === 2){
-    channel_id.send('Game not found');
-  }
+  channel_id.send(err_msg);
 
 }
 
 function compare_message(message,games,users,API_Steam_key){
   const compare_string = message.content.split(" ");
-  
-    // const games = Object.keys(games_dict)
-    if(compare_string.length < 2 || compare_string.length > 3){
-      message.channel.send("Wrong format. Use *!compare [game_name] [players_comparaison]*")
+  if(compare_string.length < 2 || compare_string.length > 3){
+    message.channel.send("Wrong format. Use *!compare [game_name] [players_comparaison]*")
+    return
+  }
+  const game_to_check = games.find(game => game.name === compare_string[1])
+  if(typeof game_to_check != 'undefined'){
+    const user_author = users.find(user => user.discord_id === '<@'+message.author.id+'>');
+    if(typeof user_author === 'undefined'){
+      message.channel.send("You are not in players list. Use *!addplayer @player [steam_user_id] [nickname]*")
       return
     }
-    const game_to_check = games.find(game => game.name === compare_string[1])
-    if(typeof game_to_check != 'undefined'){
-      console.log('Comparaison')
-      const user_author = users.find(user => user.discord_id === '<@'+message.author.id+'>');
-      if(typeof user_author === 'undefined'){
-        message.channel.send("You are not in players list. Use *!addplayer @player [steam_user_id] [nickname]*")
-        return
+    var users_vs = users.map(user => user)
+    var vs1;
+    if(compare_string.length == 3){
+      vs1 = users.find(user => user.discord_id === compare_string[2])
+      if(typeof vs1 != 'undefined'){
+        users_vs = users.filter(f => [user_author.steam_id,vs1.steam_id].includes(f.steam_id));
       }
-      var users_vs = users.map(user => user)
-      var vs1;
-      if(compare_string.length == 3){
-        vs1 = users.find(user => user.discord_id === compare_string[2])
-        if(typeof vs1 != 'undefined'){
-          users_vs = users.filter(f => [user_author.steam_id,vs1.steam_id].includes(f.steam_id));
-        }
-        
-      }
-      compare(game_to_check.id,users_vs,API_Steam_key,message,user_author,vs1)
+      
     }
-    else{
-      message.channel.send("Please add "+compare_string[1]+" game using *!addgame [game_name] [game_id]*")
-    }
+    compare(game_to_check.id,users_vs,API_Steam_key,message,user_author,vs1)
+  }
+  else{
+    message.channel.send("Please add "+compare_string[1]+" game using *!addgame [game_name] [game_id]*")
+  }
 }
 
 function list_players(users,message){
