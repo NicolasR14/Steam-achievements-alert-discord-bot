@@ -323,7 +323,7 @@ async function compare(
                 if (user.steam_id === author_id) {
                   checked.push(a.apiname);
                 }
-                _ach_dict["a_unlocked"].push([a.apiname, a.description]);
+                _ach_dict["a_unlocked"].push([a.apiname, a.description,a.name]);
               }
             });
           }

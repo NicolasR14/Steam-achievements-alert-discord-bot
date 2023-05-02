@@ -166,10 +166,11 @@ async function print_compare(nb_unlocked,achievements_locked,users,message,game_
                 
                 context.font = '20px "Open Sans Regular"';
                 context.fillStyle = '#67d4f4';
-                context.fillText("Unlocked by ", 100, 68+n*SPACE_BETWEEN);
+                context.fillText(a[1][2], 100, 68+n*SPACE_BETWEEN)
+                // context.fillText("Unlocked by ", 100+context.measureText(a[1][2]).width+10, 68+n*SPACE_BETWEEN);
                 context.fillStyle = '#bfbfbf';
                 a[0].map(async (user_a,i) => {
-                context.drawImage(users.find(user=>user.steam_id===user_a).avatar, 225+40*i, 46+n*SPACE_BETWEEN, 30, 30);
+                context.drawImage(users.find(user=>user.steam_id===user_a).avatar, 100+context.measureText(a[1][2]).width+10+40*i, 46+n*SPACE_BETWEEN, 30, 30);
                 })
                 printAtWordWrap(context, a[1][1], 100, 96+n*SPACE_BETWEEN, 20, 580)
                 // context.fillText(, 100, 96+n*70);

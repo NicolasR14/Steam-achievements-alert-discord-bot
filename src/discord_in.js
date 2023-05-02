@@ -1,6 +1,7 @@
 import {compare} from './steam_in.js'
 
 function new_game(code,channel_id){
+  var err_msg;
   switch(code){
     case 1:
       err_msg='Game added!'
@@ -22,6 +23,7 @@ function new_game(code,channel_id){
 }
 
 function new_player(code,channel_id){
+  var err_msg;
   switch(code){
     case 1:
       err_msg='Player added!'
@@ -42,6 +44,7 @@ function new_player(code,channel_id){
 }
 
 function del_player(correct,channel_id){
+  var err_msg;
   switch(code){
     case 1:
       err_msg='Player removed!'
@@ -60,6 +63,7 @@ function del_player(correct,channel_id){
 }
 
 function del_game(correct,channel_id){
+  var err_msg;
   switch(code){
     case 1:
       err_msg='Game removed!'
