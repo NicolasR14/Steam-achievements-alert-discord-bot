@@ -1,7 +1,8 @@
 import { Client, Intents} from 'discord.js';
-import { get_avatars} from './src/steam_interface.js'
-import { listen_achievements, compare_message, list_games, list_players,help} from './src/discord_interface.js'
-import {get_games_users_dict,add_game,add_user,remove_user,remove_game} from './src/dict_interface.js'
+import { get_avatars,listen_achievements} from './src/steam_in.js'
+import {compare_message, list_games, list_players,help} from './src/discord_in.js'
+// import { print_compare, neverPlayed } from "./discord_out.js";
+import {get_games_users_dict,add_game,add_user,remove_user,remove_game} from './src/dict_in-out.js'
 import {config} from './config/config.js'
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS,Intents.FLAGS.DIRECT_MESSAGES,Intents.FLAGS.GUILD_MESSAGES,Intents.FLAGS.GUILDS] });
@@ -34,6 +35,7 @@ client.login(token);
 
 async function init() {
   [Users,Games] = await get_games_users_dict(path_users_dict,path_games_dict);
+  console.log(Games)
   await get_avatars(API_Steam_key,Users) //to get avatars for each players
   listen_achievements(Guilds,Users,Games,API_Steam_key,t_0);
 }
@@ -48,6 +50,7 @@ client.on("messageCreate", message => {
       }
     })
     console.table(Guilds)
+    
     return
   }
   if(message.content.startsWith('!compare ')){

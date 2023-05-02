@@ -1,4 +1,4 @@
-import {new_game,new_player,del_player,del_game} from './discord_interface.js'
+import {new_game,new_player,del_player,del_game} from './discord_in.js'
 import {csvAppend} from "csv-append";
 import fs from 'fs';
 

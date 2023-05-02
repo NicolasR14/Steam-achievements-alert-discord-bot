@@ -1,7 +1,7 @@
 import { string } from "mathjs";
 import Canvas from "canvas";
 import fetch from "node-fetch";
-import { print_compare, neverPlayed } from "./discord_interface.js";
+import { print_compare, neverPlayed } from "./discord_out.js";
 //load steam profile pictures
 async function get_avatars(API_Steam_key, users) {
   var ids = ""; //list
@@ -31,6 +31,51 @@ async function get_avatars(API_Steam_key, users) {
     .catch(function (err) {
       console.error(err);
     });
+}
+
+function listen_achievements(guilds,users,games,API_Steam_key,t_0){
+  console.log('listening to new achievements...')
+
+  setInterval(async function() {
+    console.log('//////////////////////////////')
+    //Games list
+    var games_list = games.map(function(game){
+      return parseInt(game.id);
+    });
+    console.log("Games list : "+games.map(game => game.name))
+    
+    //Users list
+    // const users = Object.keys(user_dict)
+    users.forEach(function(user){
+      get_recently_played_games(user.steam_id,API_Steam_key)
+    .then(function(games_user){
+      if (games_user){
+        console.log("Recently played games for "+user.nickname+" : "+ Object.keys(games_user).map(function(key){return games_user[key].name}))
+        games_user.forEach(function(g_u){
+          if(games_list.includes(g_u.appid)){
+            get_achievements_to_print(user,API_Steam_key,g_u,t_0,users)
+              .then(async function(achievements){
+                if(achievements.length != 0){
+                  const eligible_guilds = guilds.filter(g=> user.guilds.includes(g.id) && games.find(game => game.id === g_u.appid).guilds.includes(g.id) && typeof g.channel_id != 'undefined')
+                  if (eligible_guilds.length != 0){
+                      await Promise.all(achievements.map(a => is_unlocked_for_others(a,API_Steam_key,users)))
+                      const channels_ids = eligible_guilds.map(g => g.channel)
+                      channels_ids.forEach(function(channel){
+                        achievements.forEach(a =>print_achievement(a,users,channel,API_Steam_key))
+                    })
+                }}});
+                  }
+                })
+              }
+      else {
+        console.log("No recently played games for "+user)
+      }
+            })
+    .catch(function(err) {
+      console.error(err);
+    })
+    })
+  },10000);
 }
 
 //check if this achievement 'a' is unlocked for other users in the discord server (user_dict)
@@ -335,7 +380,7 @@ async function compare(
       achievement.push(dict_a.icon);
     })
   );
-
+    console.log('print')
   print_compare(
     to_print_nb,
     to_print_achievements,
@@ -348,6 +393,7 @@ async function compare(
 }
 
 export {
+  listen_achievements,
   get_avatars,
   is_unlocked_for_others,
   get_recently_played_games,
