@@ -1,14 +1,14 @@
-# discord_bot
+# Steam achievements alert discord bot
 This is a discord bot showing Steam achievements when unlocked. 
 
-You can also use it to compare achievements between players on a specified game and show progress for the game (% unlocked achievements).
+You can also use it to compare achievements with your friends on a specified game and show progress for the game (% unlocked achievements).
 
 It uses Discord API and Steam API and you'll need keys for both. Refer to https://discord.com/developers/docs/intro to know how to add a bot in a discord server.
 
 Have fun !
 
 Command lines (type !help) :
-- *!on* Enable the new achievements listener
+- *!on* Specify the channel where the new achievements will be displayed
 - *!compare [game_name]* Compare achievements between players
 - *!removegame game_name* Remove a game to comparaison list
 - *!addgame [game_name] [game_id]* Add a game to comparaison list (A game must be in this list to be compared)
