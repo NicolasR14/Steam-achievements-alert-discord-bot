@@ -3,7 +3,7 @@ import { MessageAttachment , MessageEmbed,MessageActionRow, MessageButton} from 
 import Canvas from 'canvas';
 import {typeOf} from "mathjs";
 import fs from 'fs';
-import {backButton,forwardButton} from '../assets/Buttons.js';
+import {backButton,forwardButton} from '../assets/buttons.js';
 
 function neverPlayed(author,channel){
     channel.send(author.nickname,'never played to this game');
