@@ -2,7 +2,7 @@ import { string } from "mathjs";
 import Canvas from "canvas";
 import fetch from "node-fetch";
 // import { language } from "config.js"
-import { print_compare, neverPlayed } from "./discord_out.js";
+import { print_compare, neverPlayed,print_achievement } from "./discord_out.js";
 //load steam profile pictures
 async function get_avatars(API_Steam_key, users) {
   var ids = ""; //list
