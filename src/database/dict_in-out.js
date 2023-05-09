@@ -1,7 +1,6 @@
-import {new_game,new_player,del_player,del_game} from './discord_in.js'
+import {new_game,new_player,del_player,del_game} from '../discord_in.js'
 import {csvAppend} from "csv-append";
 import fs from 'fs';
-
 
 class User {
     constructor(steam_id,discord_id,nickname,guilds){
@@ -21,7 +20,6 @@ class Game {
         this.guilds = guilds;
     }
 }
-
 
 //Get infos from games.csv & users.csv
 async function get_games_users_dict(path_users,path_games){
