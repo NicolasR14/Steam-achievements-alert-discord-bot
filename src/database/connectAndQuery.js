@@ -1,5 +1,6 @@
 import sql from 'mssql';
 import {config} from '../../config/config.js'
+import {new_game,new_player,del_player,del_game} from '../discord_in.js'
 
 const configDB = {
     user: config.userDB, // better stored in an app setting such as process.env.DB_USER
@@ -34,98 +35,140 @@ class Game {
     }
 }
 
-console.log("Starting...");
-// connectAndQuery();
-
-async function connect() {
-    try {
-        return poolConnection = await sql.connect(configDB);
-        // console.log("Reading rows from the Table...");
-        // var resultSet = await poolConnection.request().query(`SELECT TOP 20 pc.Name as CategoryName,
-        //     p.name as ProductName 
-        //     FROM [SalesLT].[ProductCategory] pc
-        //     JOIN [SalesLT].[Product] p ON pc.productcategoryid = p.productcategoryid`);
-
-        // console.log(`${resultSet.recordset.length} rows returned.`);
-
-        // // output column headers
-        // var columns = "";
-        // for (var column in resultSet.recordset.columns) {
-        //     columns += column + ", ";
-        // }
-        // console.log("%s\t", columns.substring(0, columns.length - 2));
-
-        // // ouput row contents from default record set
-        // resultSet.recordset.forEach(row => {
-        //     console.log("%s\t%s", row.CategoryName, row.ProductName);
-        // });
-        // close connection only when we're certain application is finished
-        // poolConnection.close();
-    } catch (err) {
-        console.error(err.message);
-    }
-}
-
 async function getGamesAndUsers(){
-    sql.connect(configDB)
-    .then(async function(poolConnection) {
-        var users = [];
-        var games = [];
-        await Promise.all([
-            //get users
-            new Promise(async function(resolve) {
-                const usersRecordSet = await poolConnection.request().query(`SELECT * FROM [Users]`).recordset;
-                console.log(usersRecordSet)
-                // await Promise.all(usersRecordSet.map(async (user) => {
-                //     const guilds = poolConnection.request().query(`SELECT GuildID FROM Guilds WHERE UserID='${user.DiscordID}'`).recordset
-                //     console.log(guilds)
-                //     // users.push(new User(user.SteamID,user.DiscordID,user.DiscordNickname))
-                // }))
-                resolve()
+    var users = [];
+    var games = [];
+    await sql.connect(configDB)
+        .then(async function(poolConnection) {
+            await Promise.all([
+                //get users
+                new Promise(async function(resolve) {
+                    const usersRecordSet = await poolConnection.request().query(`SELECT * FROM Users;`).then(result => result.recordset);
+                    await Promise.all(usersRecordSet.map(async (user) => {
+                        const guildsRecordSet = await poolConnection.request().query(`SELECT GuildID FROM [Guilds.Users] WHERE UserID='${user.DiscordID}';`).then(result => result.recordset);
+                        const guilds = guildsRecordSet.map(g => g.GuildID)
+                        users.push(new User(user.SteamID,user.DiscordID,user.DiscordNickname,guilds))
+                    }))
+                    resolve()
+                })
+                ,
+                new Promise(async function(resolve) {
+                    const gamesRecordSet = await poolConnection.request().query(`SELECT * FROM Games;`).then(result => result.recordset);
+                    await Promise.all(gamesRecordSet.map(async (game) => {
+                        const guildsRecordSet = await poolConnection.request().query(`SELECT GuildID FROM [Guilds.Games] WHERE GameID='${game.AppID}';`).then(result => result.recordset);
+                        const guilds = guildsRecordSet.map(g => g.GuildID)
+                        games.push(new Game(game.Name,game.AppID,guilds))
+                    }))
+                    resolve()
+                })
+            ])
+            poolConnection.close();
+        }).catch (err => {
+            console.error(err.message);
         })
-        // ,
-        // new Promise(async function(resolve) {
-        //     var resultSet = await poolConnection.request().query(`SELECT *
-        //     //     FROM [Games]`);
-        //     console.log(resultSet)
-        
-        // })
-    ])
-        poolConnection.close();
-        return users,games
-    })
+    // console.table(users)
+    // console.table(games)
+    return [users,games]
 }
 
-async function addGame(){
+async function addGame(message,games){
     await sql.connect(configDB)
-    .then(poolConnection => {
-
+    .then(async function(poolConnection) {
+        const game_string = message.content.split(" ");
+        const [gameName,gameID] = [game_string[1],game_string[2]]
+        try{
+        await poolConnection.request().query(`INSERT INTO [Games] VALUES ('${gameID}','${gameName}');`)
+        }
+        catch{
+            console.log(`'${gameName}' already known in DB`)
+        }
+        await poolConnection.request().query(`INSERT INTO [Guilds.Games] VALUES ('${message.guildId}','${gameID}');`)
+        games.push(new Game(gameName,gameID,[message.guildId]))
         poolConnection.close();
+    }).catch (err => {
+        console.error(err.message);
     })
 }
 
-async function addUser(){
+async function addUser(message,users){
     await sql.connect(configDB)
-    .then(poolConnection => {
-
+    .then(async function(poolConnection) {
+        const user_string = message.content.split(" ");
+        const [DiscordID,SteamID,DiscordNickname] = [user_string[1],user_string[2],user_string[3]]
+        try{
+            await poolConnection.request().query(`INSERT INTO [Users] VALUES ('${SteamID}','${DiscordID}','${DiscordNickname}');`)
+        }
+        catch{
+            console.log(`'${DiscordNickname}' already known in DB`)
+        }
+        await poolConnection.request().query(`INSERT INTO [Guilds.Users] VALUES ('${message.guildId}','${DiscordID}');`)
+        users.push(new User(SteamID,DiscordID,DiscordNickname,[message.guildId]))
         poolConnection.close();
+    }).catch (err => {
+        console.error(err.message);
     })
 }
 
-async function removeGame(){
+async function removeGame(message,games){
+    const game_string = message.content.split(" ");
+    var gameID = false
+    //Delete from games dictionnary
+    games.forEach(game =>{
+        if(game.name === game_string[1]){
+            gameID = game.id
+            if(!game.guilds.includes(message.guildId)){
+                del_game(2,message.channel)
+                return
+            }
+            const index = game.guilds.indexOf(message.guildId);
+            game.guilds.splice(index,1)
+            del_game(1,message.channel)
+            return
+        }
+    })
+    if(!gameID){
+        del_game(2,message.channel)
+    }
+    
+    //Delete in database
     await sql.connect(configDB)
-    .then(poolConnection => {
-
+    .then(async function(poolConnection) {
+        await poolConnection.request().query(`DELETE FROM [Guilds.Games] WHERE GuildID='${message.guildId}' AND GameID='${gameID}';`)
         poolConnection.close();
+    }).catch (err => {
+        console.error(err.message);
     })
 }
 
-async function removeUser(){
+async function removeUser(message,users){
+    const user_string = message.content.split(" ");
+    var userID = false
+    //Delete from games dictionnary
+    users.forEach(user =>{
+        if(user.discord_id === user_string[1]){
+            userID = user.discord_id
+            if(!user.guilds.includes(message.guildId)){
+                del_player(2,message.channel)
+                return
+            }
+            const index = user.guilds.indexOf(message.guildId);
+            user.guilds.splice(index,1)
+            del_player(1,message.channel)
+            return
+        }
+    })
+    if(!userID){
+        del_player(2,message.channel)
+    }
+    
+    //Delete in database
     await sql.connect(configDB)
-    .then(poolConnection => {
-
+    .then(async function(poolConnection) {
+        await poolConnection.request().query(`DELETE FROM [Guilds.Users] WHERE GuildID='${message.guildId}' AND UserID='${userID}';`)
         poolConnection.close();
+    }).catch (err => {
+        console.error(err.message);
     })
 }
 
-getGamesAndUsers()
+export {getGamesAndUsers,addGame,addUser,removeGame,removeUser};

@@ -2,7 +2,8 @@ import { Client, Intents} from 'discord.js';
 import { get_avatars,listen_achievements} from './src/steam_in.js'
 import {compare_message, list_games, list_players,help} from './src/discord_in.js'
 // import { print_compare, neverPlayed } from "./discord_out.js";
-import {get_games_users_dict,add_game,add_user,remove_user,remove_game} from './src/dict_in-out.js'
+// import {get_games_users_dict,add_game,add_user,remove_user,remove_game} from './src/dict_in-out.js'
+import {getGamesAndUsers,addGame,addUser,removeGame,removeUser} from './src/database/connectAndQuery.js'
 import {config} from './config/config.js'
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS,Intents.FLAGS.DIRECT_MESSAGES,Intents.FLAGS.GUILD_MESSAGES,Intents.FLAGS.GUILDS] });
@@ -34,15 +35,16 @@ client.once('ready', () => {
 client.login(token);
 
 async function init() {
-  [Users,Games] = await get_games_users_dict(path_users_dict,path_games_dict);
-  console.log(Games)
+  [Users,Games] = await getGamesAndUsers(path_users_dict,path_games_dict);
+  console.table(Users)
+  console.table(Games)
   await get_avatars(API_Steam_key,Users) //to get avatars for each players
   listen_achievements(Guilds,Users,Games,API_Steam_key,t_0);
 }
 
 //App reaction to posts in a discord channel
 client.on("messageCreate", message => {
-  if(message.content === "!on"){
+  if(message.content === "!ton"){
     Guilds.forEach(guild =>{
       if(guild.id === message.guildId){
         guild.channel_id = message.channelId;
@@ -53,17 +55,17 @@ client.on("messageCreate", message => {
     
     return
   }
-  if(message.content.startsWith('!compare ')){
+  if(message.content.startsWith('!tcompare ')){
     compare_message(message,Games,Users,API_Steam_key)
     return
   }
-  if(message.content.startsWith('!addgame ')){
-    add_game(message,path_games_dict,Games)
+  if(message.content.startsWith('!taddgame ')){
+    addGame(message,Games)
     return
   }
-  if(message.content.startsWith('!addplayer ')){
+  if(message.content.startsWith('!taddplayer ')){
     async function _add_user(){
-      await add_user(message,path_users_dict,Users);
+      await addUser(message,Users);
       // [users, games] = await get_games_users_dict(path_users_dict,path_games_dict);
       get_avatars(API_Steam_key,Users);
 
@@ -72,23 +74,23 @@ client.on("messageCreate", message => {
     console.table(Users)
     return
   }
-  if(message.content.startsWith('!removegame ')){
-    remove_game(message,path_games_dict,Games)
+  if(message.content.startsWith('!tremovegame ')){
+    removeGame(message,Games)
     return
   }
-  if(message.content.startsWith('!removeplayer ')){
-    remove_user(message,path_users_dict,Users)
+  if(message.content.startsWith('!tremoveplayer ')){
+    removeUser(message,Users)
     return
   }
-  if(message.content==='!listplayers'){
+  if(message.content==='!tlistplayers'){
     list_players(Users,message)
     return
   }
-  if(message.content==='!listgames'){
+  if(message.content==='!tlistgames'){
     list_games(Games,message)
     return
   }
-  if(message.content==='!help'){
+  if(message.content==='!thelp'){
     help(message.channel)
     return
   }

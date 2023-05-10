@@ -45,7 +45,7 @@ function new_player(code,channel_id){
 
 function del_player(correct,channel_id){
   var err_msg;
-  switch(code){
+  switch(correct){
     case 1:
       err_msg='Player removed!'
       break;
@@ -64,7 +64,7 @@ function del_player(correct,channel_id){
 
 function del_game(correct,channel_id){
   var err_msg;
-  switch(code){
+  switch(correct){
     case 1:
       err_msg='Game removed!'
       break;

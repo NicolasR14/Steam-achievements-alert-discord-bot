@@ -77,7 +77,7 @@ return [users,games]
 //Add a game to games list
 async function add_game(message,path_games,games){
     const game_string = message.content.split(" ");
-    const [name,id] = [game_string[1],parseInt(game_string[2])]
+    const [name,id] = [game_string[1],game_string[2]]
     if(!game_string[1] || !game_string[2] || game_string[3]){
         new_game(0,message.channel)
         return
