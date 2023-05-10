@@ -9,7 +9,7 @@ Have fun !
 
 Command lines (type !help) :
 - *!on* Specify the channel where the new achievements will be displayed
-- *!compare [game_name]* Compare achievements between players
+- *!compare [game_name] [optional:user_discord_tag]* Compare achievements between players
 - *!removegame game_name* Remove a game to comparaison list
 - *!addgame [game_name] [game_id]* Add a game to comparaison list (A game must be in this list to be compared)
 - *!listgames* List the comparaison list
