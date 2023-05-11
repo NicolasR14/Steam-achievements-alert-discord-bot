@@ -1,11 +1,11 @@
-import {MessageButton} from 'discord.js';
-const backButton = new MessageButton({
+import {ButtonBuilder} from 'discord.js';
+const backButton = new ButtonBuilder({
           style: 'SECONDARY',
           label: 'Back',
           emoji: '⬅️',
           customId: 'back'
         })
-const forwardButton = new MessageButton({
+const forwardButton = new ButtonBuilder({
       style: 'SECONDARY',
       label: 'Forward',
       emoji: '➡️',

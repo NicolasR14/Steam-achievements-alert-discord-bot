@@ -96,7 +96,7 @@ async function addUser(message,users){
         const user_string = message.content.split(" ");
         const [DiscordID,SteamID,DiscordNickname] = [user_string[1],user_string[2],user_string[3]]
         try{
-            await poolConnection.request().query(`INSERT INTO [Users] VALUES ('${SteamID}','${DiscordID}','${DiscordNickname}');`)
+            await poolConnection.request().query(`INSERT INTO [Users] VALUES ('${SteamID}','${DiscordNickname}','${DiscordID}');`)
         }
         catch{
             console.log(`'${DiscordNickname}' already known in DB`)

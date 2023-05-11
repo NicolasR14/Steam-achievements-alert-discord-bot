@@ -1,5 +1,5 @@
 import {is_unlocked_for_others, get_recently_played_games, get_achievements_to_print, compare} from './steam_in.js'
-import { MessageAttachment , MessageEmbed,MessageActionRow, MessageButton} from 'discord.js';
+import { AttachmentBuilder , EmbedBuilder,ActionRowBuilder} from 'discord.js';
 import Canvas from 'canvas';
 import {typeOf} from "mathjs";
 import fs from 'fs';
@@ -92,7 +92,7 @@ async function print_achievement(a,users,channel,API_Steam_key){
       context.fillText(txt2_1, 25, 165);
       context.fillText(txt2_2, decal+(i+1)*40, 165);
   
-      attachment = new MessageAttachment(canvas.toBuffer())
+      attachment = new AttachmentBuilder(canvas.toBuffer())
     })
     .then(function(){
       channel.send(to_print);
@@ -140,7 +140,7 @@ async function print_compare(nb_unlocked,achievements_locked,users,message,game_
         n += 1;
         }) 
     
-        attachment = new MessageAttachment(canvas.toBuffer())
+        attachment = new AttachmentBuilder(canvas.toBuffer())
         message.channel.send({ files: [attachment] })
     }
     async function second_part(){
@@ -177,18 +177,18 @@ async function print_compare(nb_unlocked,achievements_locked,users,message,game_
         
                 n += 1;
             })
-            return new MessageAttachment(canvas.toBuffer(),'img_part2.png')
+            return new AttachmentBuilder(canvas.toBuffer(),'img_part2.png')
         }
 
         const {author_1, channel} = message
         const canFitOnOnePage = achievements_locked.length <= MAX_PAGE
         const slice_achievements = achievements_locked.slice(0,0+5)
         const embedMessage = await channel.send({
-        embeds: [new MessageEmbed().setTitle(`Showing locked achievements ${1}-${slice_achievements.length} out of ${achievements_locked.length} for ${author.nickname}`)],
+        embeds: [new EmbedBuilder().setTitle(`Showing locked achievements ${1}-${slice_achievements.length} out of ${achievements_locked.length} for ${author.nickname}`)],
         files: [get_embedded_img(slice_achievements,1,slice_achievements.length)],
         components: canFitOnOnePage
             ? []
-            : [new MessageActionRow({components: [forwardButton]})]
+            : [new ActionRowBuilder({components: [forwardButton]})]
         })
         // Exit if there is only one page of guilds (no need for all of this)
         if (canFitOnOnePage) return
@@ -204,10 +204,10 @@ async function print_compare(nb_unlocked,achievements_locked,users,message,game_
         const slice_achievements = achievements_locked.slice(currentIndex,currentIndex+5)
     
         await interaction.update({
-            embeds: [new MessageEmbed().setTitle(`Showing locked achievements ${currentIndex+1}-${currentIndex+slice_achievements.length} out of ${achievements_locked.length} for ${author.nickname}`)],
+            embeds: [new EmbedBuilder().setTitle(`Showing locked achievements ${currentIndex+1}-${currentIndex+slice_achievements.length} out of ${achievements_locked.length} for ${author.nickname}`)],
             files: [get_embedded_img(slice_achievements,currentIndex+1,currentIndex+slice_achievements.length)],
             components: [
-            new MessageActionRow({
+            new ActionRowBuilder({
                 components: [
                 // back button if it isn't the start
                 ...(currentIndex ? [backButton] : []),
