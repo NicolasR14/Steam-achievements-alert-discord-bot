@@ -1,4 +1,4 @@
-import {is_unlocked_for_others, get_recently_played_games, get_achievements_to_print, compare} from './steam_in.js'
+import {is_unlocked_for_others, get_recently_played_games, get_achievements_to_print, compare} from './steam_interface.js'
 import { AttachmentBuilder , EmbedBuilder,ActionRowBuilder} from 'discord.js';
 import Canvas from 'canvas';
 import {typeOf} from "mathjs";

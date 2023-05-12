@@ -1,7 +1,7 @@
 const { SlashCommandBuilder } = require('discord.js');
 
 function list_players(guildId,users){
-	var to_send = `List of players in this server:\n`
+	var to_send = `Players I listen to for new achievements\n`
 	users.forEach(u =>{
 	  if (u.guilds.includes(guildId)){
 		to_send+='\t'+u.discord_id+', SteamID: '+u.steam_id+', Nickname: '+u.nickname+'\n'
@@ -13,7 +13,7 @@ function list_players(guildId,users){
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('list_players')
-		.setDescription('List the games where the new achievements are listened and available for compare commands'),
+		.setDescription('Lists the players the bot listens to for new achievements'),
 		
 	async execute(interaction,globalVariables) {
 		await interaction.reply(list_players(interaction.guildId,globalVariables.Users));
