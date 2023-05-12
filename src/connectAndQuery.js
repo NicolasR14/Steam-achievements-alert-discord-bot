@@ -1,6 +1,6 @@
-import sql from 'mssql';
-import {config} from '../../config/config.js'
-import {new_game,new_player,del_player,del_game} from '../discord_in.js'
+const sql = require('mssql') ;
+const config = require('../config/config.json')
+// const {new_game,new_player,del_player,del_game} = require('./discord_in.js')
 
 const configDB = {
     user: config.userDB, // better stored in an app setting such as process.env.DB_USER
@@ -117,17 +117,17 @@ async function removeGame(message,games){
         if(game.name === game_string[1]){
             gameID = game.id
             if(!game.guilds.includes(message.guildId)){
-                del_game(2,message.channel)
+                // del_game(2,message.channel)
                 return
             }
             const index = game.guilds.indexOf(message.guildId);
             game.guilds.splice(index,1)
-            del_game(1,message.channel)
+            // del_game(1,message.channel)
             return
         }
     })
     if(!gameID){
-        del_game(2,message.channel)
+        // del_game(2,message.channel)
     }
     
     //Delete in database
@@ -148,18 +148,18 @@ async function removeUser(message,users){
         if(user.discord_id === user_string[1]){
             userID = user.discord_id
             if(!user.guilds.includes(message.guildId)){
-                del_player(2,message.channel)
+                // del_player(2,message.channel)
                 return
             }
             const index = user.guilds.indexOf(message.guildId);
             user.guilds.splice(index,1)
-            del_player(1,message.channel)
+            // del_player(1,message.channel)
             return
         }
     })
-    if(!userID){
-        del_player(2,message.channel)
-    }
+    // if(!userID){
+    //     del_player(2,message.channel)
+    // }
     
     //Delete in database
     await sql.connect(configDB)
@@ -171,4 +171,4 @@ async function removeUser(message,users){
     })
 }
 
-export {getGamesAndUsers,addGame,addUser,removeGame,removeUser};
+module.exports = {getGamesAndUsers,addGame,addUser,removeGame,removeUser};

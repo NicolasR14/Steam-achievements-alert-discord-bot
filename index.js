@@ -3,11 +3,10 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { Client,Collection, Events, GatewayIntentBits } = require('discord.js');
 const { discord_token,API_Steam_key } = require('./config/config.json');
+const {getGamesAndUsers} = require('./src/connectAndQuery.js')
 
 // Create a new client instance
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
-
-
 
 class Guild {
   constructor(guild_id,channel_id){
@@ -17,16 +16,22 @@ class Guild {
   }
 }
 
-var Guilds;
-var Users;
-var Games;
+var globalVariables = {
+	'Guilds':[],
+	'Users':[],
+	'Games':[]
+}
+
+// var Guilds;
+// var Users;
+// var Games;
 
 // When the client is ready, run this code (only once)
 // We use 'c' for the event parameter to keep it separate from the already defined 'client'
 client.once(Events.ClientReady, async c => {
 	console.log(`Ready! Logged in as ${c.user.tag}`);
-  Guilds = client.guilds.cache.map(guild => new Guild(guild.id));
-  // [Users,Games] = await getGamesAndUsers(path_users_dict,path_games_dict);
+	globalVariables.Guilds = client.guilds.cache.map(guild => new Guild(guild.id));
+  	[globalVariables.Users,globalVariables.Games] = await getGamesAndUsers();
   // console.table(Users)
   // console.table(Games)
   // await get_avatars(API_Steam_key,Users) //to get avatars for each players
@@ -75,17 +80,21 @@ const t_0 = parseInt(1683142271000/1000);
 
 //////////TEST
 client.commands = new Collection();
-const commandsPath = './src/commands';
-const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
+const foldersPath = path.join(__dirname, 'src/commands');
+const commandFolders = fs.readdirSync(foldersPath);
 
-for (const file of commandFiles) {
-	const filePath = `${commandsPath}/${file}`;
-  const command = require(filePath);
-	// Set a new item in the Collection with the key as the command name and the value as the exported module
-	if ('data' in command && 'execute' in command) {
-		client.commands.set(command.data.name, command);
-	} else {
-		console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
+for (const folder of commandFolders) {
+	const commandsPath = path.join(foldersPath, folder);
+	const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
+	for (const file of commandFiles) {
+		const filePath = path.join(commandsPath, file);
+		const command = require(filePath);
+		// Set a new item in the Collection with the key as the command name and the value as the exported module
+		if ('data' in command && 'execute' in command) {
+			client.commands.set(command.data.name, command);
+		} else {
+			console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
+		}
 	}
 }
 
@@ -100,7 +109,7 @@ client.on(Events.InteractionCreate, async interaction => {
 	}
 
 	try {
-		await command.execute(interaction);
+		await command.execute(interaction,globalVariables);
 	} catch (error) {
 		console.error(error);
 		if (interaction.replied || interaction.deferred) {
