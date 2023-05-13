@@ -4,7 +4,7 @@ const path = require('node:path');
 const { Client,Collection, Events, GatewayIntentBits } = require('discord.js');
 const { discord_token,API_Steam_key } = require('./config/config.json');
 const {getGamesAndUsers} = require('./src/connectAndQuery.js')
-const {getAvatars} = require('./src/steam_interface.js')
+const {getAvatars,listenForNewAchievements} = require('./src/steam_interface.js')
 
 // Create a new client instance
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
@@ -33,8 +33,8 @@ client.once(Events.ClientReady, async c => {
 	console.log(`Ready! Logged in as ${c.user.tag}`);
 	globalVariables.Guilds = client.guilds.cache.map(guild => new Guild(guild.id));
   	[globalVariables.Users,globalVariables.Games] = await getGamesAndUsers();
-  	getAvatars(API_Steam_key,globalVariables.Users) //to get avatars for each players
-  // listen_achievements(Guilds,Users,Games,API_Steam_key,t_0);
+  	getAvatars(globalVariables.Users) //to get avatars for each players
+  	listenForNewAchievements(globalVariables,t_0);
 });
 
 // Log in to Discord with your client's token
@@ -53,7 +53,7 @@ client.login(discord_token);
 
 // const client = new Client({ intents: [GatewayIntentBits.Guilds], partials: [Partials.Channel] });
 //const t_0 = parseInt(Date.now()/1000);
-const t_0 = parseInt(1683142271000/1000);
+const t_0 = parseInt(1683531420000/1000);
 // const token = config.discord_token //Discord bot token
 
 // const API_Steam_key = config.API_Steam_key //Steam API key
