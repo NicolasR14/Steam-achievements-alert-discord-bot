@@ -1,5 +1,6 @@
 const sql = require('mssql') ;
 const config = require('../config/config.json')
+const {User} = require('../src/models/User')
 // const {new_game,new_player,del_player,del_game} = require('./discord_in.js')
 
 const configDB = {
@@ -16,16 +17,7 @@ const configDB = {
     }
 }
 
-class User {
-    constructor(steam_id,discord_id,nickname,guilds){
-      this.steam_id = steam_id;
-      this.discord_id= discord_id;
-      this.nickname = nickname;
-      this.a_dis = [];
-      this.guilds = guilds;
-      this.avatar;
-    }
-}
+
 
 class Game {
     constructor(name,id,guilds){
@@ -90,20 +82,15 @@ async function addGame(message,games){
     })
 }
 
-async function addUser(message,users){
+async function addUserDB(DiscordID,SteamID,DiscordNickname,interaction,is_new_player){
     await sql.connect(configDB)
     .then(async function(poolConnection) {
-        const user_string = message.content.split(" ");
-        const [DiscordID,SteamID,DiscordNickname] = [user_string[1],user_string[2],user_string[3]]
-        try{
+        if(is_new_player){
             await poolConnection.request().query(`INSERT INTO [Users] VALUES ('${SteamID}','${DiscordNickname}','${DiscordID}');`)
         }
-        catch{
-            console.log(`'${DiscordNickname}' already known in DB`)
-        }
-        await poolConnection.request().query(`INSERT INTO [Guilds.Users] VALUES ('${message.guildId}','${DiscordID}');`)
-        users.push(new User(SteamID,DiscordID,DiscordNickname,[message.guildId]))
+        await poolConnection.request().query(`INSERT INTO [Guilds.Users] VALUES ('${interaction.guildId}','${DiscordID}');`)
         poolConnection.close();
+        await interaction.reply('Player added');
     }).catch (err => {
         console.error(err.message);
     })
@@ -130,6 +117,7 @@ async function removeGame(message,games){
         // del_game(2,message.channel)
     }
     
+    ////////////////ADD CONDITION IF GUILDS == 0 il faut delete
     //Delete in database
     await sql.connect(configDB)
     .then(async function(poolConnection) {
@@ -140,35 +128,19 @@ async function removeGame(message,games){
     })
 }
 
-async function removeUser(message,users){
-    const user_string = message.content.split(" ");
-    var userID = false
-    //Delete from games dictionnary
-    users.forEach(user =>{
-        if(user.discord_id === user_string[1]){
-            userID = user.discord_id
-            if(!user.guilds.includes(message.guildId)){
-                // del_player(2,message.channel)
-                return
-            }
-            const index = user.guilds.indexOf(message.guildId);
-            user.guilds.splice(index,1)
-            // del_player(1,message.channel)
-            return
-        }
-    })
-    // if(!userID){
-    //     del_player(2,message.channel)
-    // }
-    
+async function removePlayerDB(userDiscordId,guildId,nbGuildsUser){
+
     //Delete in database
     await sql.connect(configDB)
     .then(async function(poolConnection) {
-        await poolConnection.request().query(`DELETE FROM [Guilds.Users] WHERE GuildID='${message.guildId}' AND UserID='${userID}';`)
+        await poolConnection.request().query(`DELETE FROM [Guilds.Users] WHERE GuildID='${guildId}' AND UserID='${userDiscordId}';`)
+        if(nbGuildsUser===1){
+            await poolConnection.request().query(`DELETE FROM [Users] WHERE DiscordID='${userDiscordId}';`)
+        }
         poolConnection.close();
     }).catch (err => {
         console.error(err.message);
     })
 }
 
-module.exports = {getGamesAndUsers,addGame,addUser,removeGame,removeUser};
+module.exports = {getGamesAndUsers,addGame,addUserDB,removeGame,removePlayerDB};

@@ -26,7 +26,7 @@ async function getAvatars(users) {
           Canvas.loadImage(_user.avatar) //load image
             .then(function (img) {
               users.find(user => user.steam_id === _user.steamid).avatar = img
-              console.log(users.find(user => user.steam_id === _user.steamid).avatar)
+              console.log(`Avatar updated for ${users.find(user => user.steam_id === _user.steamid).nickname}`)
               // user_dict[user.steamid]["avatar"] = img; //stock the loaded image in user_dict
             });
         })

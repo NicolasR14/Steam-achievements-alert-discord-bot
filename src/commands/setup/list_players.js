@@ -4,7 +4,7 @@ function list_players(guildId,users){
 	var to_send = `Players I listen to for new achievements\n`
 	users.forEach(u =>{
 	  if (u.guilds.includes(guildId)){
-		to_send+='\t'+u.discord_id+', SteamID: '+u.steam_id+', Nickname: '+u.nickname+'\n'
+		to_send+=`\t<@${u.discord_id}>, SteamID: ${u.steam_id}, Nickname: ${u.nickname}\n`
 	  }
 	})
 	return to_send

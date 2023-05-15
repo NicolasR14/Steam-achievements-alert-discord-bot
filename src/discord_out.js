@@ -15,7 +15,7 @@ const Canvas = require('canvas')
 
 
 async function displayAchievement(a,channel){
-    const to_print = a.user.discord_id + " unlocked an achievement on " + a.Name_game +". Progress : ("+a['rate_unlocked']+")";
+    const to_print = `<@${a.user.discord_id}> unlocked an achievement on ${a.Name_game}. Progress : (${a['rate_unlocked']}`;
     Canvas.registerFont('./assets/OpenSans-VariableFont_wdth,wght.ttf', { family: 'Open Sans Regular' })
     const canvas = Canvas.createCanvas(700, 190);
     const context = canvas.getContext('2d');

@@ -1,4 +1,4 @@
-import {new_game,new_player,del_player,del_game} from '../discord_in.js'
+import {new_game,new_player,del_player,del_game} from './discord_in.js'
 import {csvAppend} from "csv-append";
 import fs from 'fs';
 
@@ -149,14 +149,14 @@ function write_users_dict(users,path_users){
 async function add_user(message,path_users,users){
     const user_string = message.content.split(" ");
     const [discord_id,steam_id,nickname] = [user_string[1],user_string[2],user_string[3]]
-    if(!user_string[1] || !user_string[2] || !user_string[3]){
-        new_player(0,message.channel)
-        return
-    }
-    if(isNaN(user_string[2]) | !user_string[1].startsWith('<@')){
-        new_player(0,message.channel)
-        return
-    }
+    // if(!user_string[1] || !user_string[2] || !user_string[3]){
+    //     new_player(0,message.channel)
+    //     return
+    // }
+    // if(isNaN(user_string[2]) | !user_string[1].startsWith('<@')){
+    //     new_player(0,message.channel)
+    //     return
+    // }
 
     var is_new_player = true;
     users.forEach(user => {
@@ -185,15 +185,15 @@ async function add_user(message,path_users,users){
 
 //Remove a player from users list
 async function remove_user(message,path_users_dict,users){
-    const user_string = message.content.split(" ");
-    if(user_string.length != 2){
-        del_player(0,message.channel)
-        return
-    } 
-    if(!user_string[1].startsWith('<@')){
-        del_player(0,message.channel)
-        return
-    }
+    // const user_string = message.content.split(" ");
+    // if(user_string.length != 2){
+    //     del_player(0,message.channel)
+    //     return
+    // } 
+    // if(!user_string[1].startsWith('<@')){
+    //     del_player(0,message.channel)
+    //     return
+    // }
 
     var find = false
     users.forEach(user =>{

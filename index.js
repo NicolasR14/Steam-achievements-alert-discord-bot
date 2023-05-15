@@ -7,7 +7,9 @@ const {getGamesAndUsers} = require('./src/connectAndQuery.js')
 const {getAvatars,listenForNewAchievements} = require('./src/steam_interface.js')
 
 // Create a new client instance
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client = new Client({ intents: [GatewayIntentBits.Guilds,GatewayIntentBits.GuildMessages,
+	GatewayIntentBits.MessageContent,
+	GatewayIntentBits.GuildMembers] });
 
 class Guild {
   constructor(guild_id,channel_id){
@@ -33,6 +35,8 @@ client.once(Events.ClientReady, async c => {
 	console.log(`Ready! Logged in as ${c.user.tag}`);
 	globalVariables.Guilds = client.guilds.cache.map(guild => new Guild(guild.id));
   	[globalVariables.Users,globalVariables.Games] = await getGamesAndUsers();
+	console.table(globalVariables.Users)
+	console.table(globalVariables.Games)
   	getAvatars(globalVariables.Users) //to get avatars for each players
   	listenForNewAchievements(globalVariables,t_0);
 });
@@ -51,31 +55,8 @@ client.login(discord_token);
 // import fs from 'node:fs';
 // import path from 'node:path';
 
-// const client = new Client({ intents: [GatewayIntentBits.Guilds], partials: [Partials.Channel] });
 //const t_0 = parseInt(Date.now()/1000);
 const t_0 = parseInt(1683531420000/1000);
-// const token = config.discord_token //Discord bot token
-
-// const API_Steam_key = config.API_Steam_key //Steam API key
-
-// const path_games_dict = './config/games.csv'
-// const path_users_dict = './config/users.csv'
-
-
-// client.once('ready', () => {
-//   console.log('up as ',`${client.user.tag}`);
-//   Guilds = client.guilds.cache.map(guild => new Guild(guild.id));
-//   init()
-// });
-// // client.login(token);
-
-// async function init() {
-//   [Users,Games] = await getGamesAndUsers(path_users_dict,path_games_dict);
-//   console.table(Users)
-//   console.table(Games)
-//   await get_avatars(API_Steam_key,Users) //to get avatars for each players
-//   listen_achievements(Guilds,Users,Games,API_Steam_key,t_0);
-// }
 
 //////////TEST
 client.commands = new Collection();
