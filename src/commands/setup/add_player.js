@@ -38,7 +38,14 @@ module.exports = {
 		for (var user of globalVariables.Users){
 			if(user.discord_id === discord_id){
 				is_new_player = false
-				console.log(discord_id)
+				if(user.steam_id != steam_id){
+					await interaction.reply('User already in the DB but with another steam Id.')
+					return
+				}
+				if(user.nickname != nickname){
+					await interaction.reply('User already in the DB but with another nickname.')
+					return
+				}
 				if(user.guilds.includes(interaction.guildId)){
 					await interaction.reply('Player is already in the list')
 					// resolve()

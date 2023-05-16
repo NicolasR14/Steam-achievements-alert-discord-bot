@@ -4,10 +4,6 @@ const Canvas = require("canvas");
 const {API_Steam_key} = require('../config/config.json')
 const {displayAchievement} = require('./discord_out.js')
 
-// import { language } from "config.js"
-// import { print_compare, neverPlayed,print_achievement } from "./discord_out.js";
-//load steam profile pictures
-
 async function isPublicProfile(steamUserId){
   try{
     result = await fetch(`http://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v0001/?appid=440&key=${API_Steam_key}&steamid=${steamUserId}`).then(async res => await res.json())

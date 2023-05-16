@@ -63,20 +63,15 @@ async function getGamesAndUsers(){
     return [users,games]
 }
 
-async function addGame(message,games){
+async function addGameDB(interaction,game_id,game_name,find){
     await sql.connect(configDB)
     .then(async function(poolConnection) {
-        const game_string = message.content.split(" ");
-        const [gameName,gameID] = [game_string[1],game_string[2]]
-        try{
-        await poolConnection.request().query(`INSERT INTO [Games] VALUES ('${gameID}','${gameName}');`)
+        if(!find){
+            await poolConnection.request().query(`INSERT INTO [Games] VALUES ('${game_id}','${game_name}');`)
         }
-        catch{
-            console.log(`'${gameName}' already known in DB`)
-        }
-        await poolConnection.request().query(`INSERT INTO [Guilds.Games] VALUES ('${message.guildId}','${gameID}');`)
-        games.push(new Game(gameName,gameID,[message.guildId]))
+        await poolConnection.request().query(`INSERT INTO [Guilds.Games] VALUES ('${interaction.guildId}','${game_id}');`)
         poolConnection.close();
+        await interaction.reply('Game added');
     }).catch (err => {
         console.error(err.message);
     })
@@ -96,7 +91,7 @@ async function addUserDB(DiscordID,SteamID,DiscordNickname,interaction,is_new_pl
     })
 }
 
-async function removeGame(message,games){
+async function removeGameDB(message,games){
     const game_string = message.content.split(" ");
     var gameID = false
     //Delete from games dictionnary
@@ -143,4 +138,4 @@ async function removePlayerDB(userDiscordId,guildId,nbGuildsUser){
     })
 }
 
-module.exports = {getGamesAndUsers,addGame,addUserDB,removeGame,removePlayerDB};
+module.exports = {getGamesAndUsers,addGameDB,addUserDB,removeGameDB,removePlayerDB};
