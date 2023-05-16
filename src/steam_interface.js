@@ -1,5 +1,5 @@
 const fetch = require('node-fetch');
-const { string } = require("mathjs") ;
+const { string, ResultSetDependencies } = require("mathjs") ;
 const Canvas = require("canvas");
 const {API_Steam_key} = require('../config/config.json')
 const {displayAchievement} = require('./discord_out.js')
@@ -7,6 +7,22 @@ const {displayAchievement} = require('./discord_out.js')
 // import { language } from "config.js"
 // import { print_compare, neverPlayed,print_achievement } from "./discord_out.js";
 //load steam profile pictures
+
+async function isPublicProfile(steamUserId){
+  try{
+    result = await fetch(`http://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v0001/?appid=440&key=${API_Steam_key}&steamid=${steamUserId}`).then(async res => await res.json())
+    if(result.playerstats.success===false){
+      return 0 //Profile not public
+    }
+    return 1
+  }
+  catch(error){
+    console.log(`API error : ${error}`) //API Error or no such steam id
+    return -1
+  }
+  
+}
+
 async function getAvatars(users) {
   var ids = ""; //list
   users.forEach(user => ids += user.steam_id + ",")
@@ -73,7 +89,7 @@ function listenForNewAchievements(globalVariables,t_0){
                 })
               }
       else {
-        console.log("No recently played games for "+user)
+        console.log("No recently played games for "+user.nickname)
       }
             })
     .catch(function(err) {
@@ -396,4 +412,4 @@ async function getPercentage(achievement_unlocked, nb_unlocked, nb_tot) {
 //   );
 // }
 
-module.exports = {getAvatars,listenForNewAchievements,isUnlockedForOthers};
+module.exports = {getAvatars,listenForNewAchievements,isUnlockedForOthers,isPublicProfile};

@@ -1,7 +1,7 @@
 const { SlashCommandBuilder } = require('discord.js');
 const {addUserDB} = require('../../connectAndQuery')
 const {User} = require('../../models/User.js')
-const {getAvatars} = require('../../steam_interface')
+const {getAvatars,isPublicProfile} = require('../../steam_interface')
 
 
 module.exports = {
@@ -25,30 +25,36 @@ module.exports = {
 		const steam_id = interaction.options.getString('steam_user_id')
 		const nickname = interaction.options.getString('nickname')
 		var is_new_player = true;
-		await new Promise(async (resolve) =>{
-			for (var user of globalVariables.Users){
-				if(user.discord_id === discord_id){
-					is_new_player = false
-					console.log(discord_id)
-					if(user.guilds.includes(interaction.guildId)){
-						await interaction.reply('Player is already in the list')
-						// resolve()
-						return
-					}
-					user.guilds.push(interaction.guildId)
-					break
-				}
+		const statusProfile = await isPublicProfile(steam_id)
+		if(statusProfile!==1){
+			if(statusProfile===0){
+				await interaction.reply(`${steam_id} is not public. Can't read infos.`)
 			}
-
-
-			if (is_new_player){
-				globalVariables.Users.push(new User(steam_id,discord_id,nickname,[interaction.guildId]))
+			else{
+				await interaction.reply(`API Steam error. Please retry later.`)
 			}
-			addUserDB(discord_id,steam_id,nickname,interaction,is_new_player)
-				.then(()=>{
-					getAvatars([globalVariables.Users.find(user => user.discord_id === discord_id)])
+			return
+		}
+		for (var user of globalVariables.Users){
+			if(user.discord_id === discord_id){
+				is_new_player = false
+				console.log(discord_id)
+				if(user.guilds.includes(interaction.guildId)){
+					await interaction.reply('Player is already in the list')
 					// resolve()
-					})
-				})			
+					return
+				}
+				user.guilds.push(interaction.guildId)
+				break
+			}
+		}
+
+		if (is_new_player){
+			globalVariables.Users.push(new User(steam_id,discord_id,nickname,[interaction.guildId]))
+		}
+		addUserDB(discord_id,steam_id,nickname,interaction,is_new_player)
+			.then(()=>{
+				getAvatars([globalVariables.Users.find(user => user.discord_id === discord_id)])
+				})	
 		}
 }

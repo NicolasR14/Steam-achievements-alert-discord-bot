@@ -20,7 +20,7 @@ module.exports = {
 					return
 				}
 				removePlayerDB(discord_id,interaction.guildId,user.guilds.length)
-				if(user.guilds.length>1){
+				if(user.guilds.length===1){
 					const indexUser = globalVariables.Users.indexOf(user);
 					globalVariables.Users.splice(indexUser,1)
 					console.log(`${user.nickname} erased from DB`)
