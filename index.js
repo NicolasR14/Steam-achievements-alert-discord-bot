@@ -2,7 +2,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { Client,Collection, Events, GatewayIntentBits } = require('discord.js');
-const { discord_token,API_Steam_key } = require('./config/config.json');
+const { discord_token } = require('./config/config.json');
 const {getGamesAndUsers} = require('./src/connectAndQuery.js')
 const {getAvatars,listenForNewAchievements} = require('./src/steam_interface.js')
 
@@ -25,12 +25,6 @@ var globalVariables = {
 	'Games':[]
 }
 
-// var Guilds;
-// var Users;
-// var Games;
-
-// When the client is ready, run this code (only once)
-// We use 'c' for the event parameter to keep it separate from the already defined 'client'
 client.once(Events.ClientReady, async c => {
 	console.log(`Ready! Logged in as ${c.user.tag}`);
 	globalVariables.Guilds = client.guilds.cache.map(guild => new Guild(guild.id));
@@ -43,22 +37,11 @@ client.once(Events.ClientReady, async c => {
 
 // Log in to Discord with your client's token
 client.login(discord_token);
-// console.table(globalVariables.Users)
-// import pkg from 'discord.js';
-// const { Client, Intents, Collection, Events, GatewayIntentBits, Partials } = pkg;
-// import { get_avatars,listen_achievements} from './src/steam_in.js'
 // import {compare_message, list_games, list_players,help} from './src/discord_in.js'
-// // import { print_compare, neverPlayed } from "./discord_out.js";
-// // import {get_games_users_dict,add_game,add_user,remove_user,remove_game} from './src/dict_in-out.js'
-// import {getGamesAndUsers,addGame,addUser,removeGame,removeUser} from './src/database/connectAndQuery.js'
-// import {config} from './config/config.js'
-// import fs from 'node:fs';
-// import path from 'node:path';
 
 //const t_0 = parseInt(Date.now()/1000);
 const t_0 = parseInt(1683531420000/1000);
 
-//////////TEST
 client.commands = new Collection();
 const foldersPath = path.join(__dirname, 'src/commands');
 const commandFolders = fs.readdirSync(foldersPath);
@@ -100,62 +83,10 @@ client.on(Events.InteractionCreate, async interaction => {
 	}
 });
 
-
-//////////TEST
-
-// //App reaction to posts in a discord channel
-// client.rest.on("messageCreate", message => {
-//   if(message.content === "!ton"){
-//     Guilds.forEach(guild =>{
-//       if(guild.id === message.guildId){
-//         guild.channel_id = message.channelId;
-//         guild.channel = message.channel;
-//       }
-//     })
-//     console.table(Guilds)
-    
-//     return
-//   }
 //   if(message.content.startsWith('!tcompare ')){
 //     compare_message(message,Games,Users,API_Steam_key)
-//     return
-//   }
-//   if(message.content.startsWith('!taddgame ')){
-//     addGame(message,Games)
-//     return
-//   }
-//   if(message.content.startsWith('!taddplayer ')){
-//     async function _add_user(){
-//       await addUser(message,Users);
-//       // [users, games] = await get_games_users_dict(path_users_dict,path_games_dict);
-//       get_avatars(API_Steam_key,Users);
-
-//     }
-//     _add_user()
-//     console.table(Users)
 //     return
 //   }
 //   if(message.content.startsWith('!tremovegame ')){
 //     removeGame(message,Games)
 //     return
-//   }
-//   if(message.content.startsWith('!tremoveplayer ')){
-//     removeUser(message,Users)
-//     return
-//   }
-//   if(message.content==='!tlistplayers'){
-//     list_players(Users,message)
-//     return
-//   }
-//   if(message.content==='!tlistgames'){
-//     list_games(Games,message)
-//     return
-//   }
-//   if(message.content==='!thelp'){
-//     help(message.channel)
-//     return
-//   }
-
-// })
-
-

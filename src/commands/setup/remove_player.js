@@ -30,7 +30,6 @@ module.exports = {
 					user.guilds.splice(indexGuild,1)
 					console.log(`${interaction.guildId} removed from ${user.nickname}'s guilds list`)
 				}
-				await interaction.reply(`${user.nickname} removed from users list`);
 				return
 			}
 		}

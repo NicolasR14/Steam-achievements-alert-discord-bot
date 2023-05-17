@@ -1,86 +1,5 @@
 import {compare} from './steam_in.js'
 
-function new_game(code,channel_id){
-  var err_msg;
-  switch(code){
-    case 1:
-      err_msg='Game added!'
-      break;
-    case 0:
-      err_msg='Wrong format. Please use : !addgame [game_name] [game_id]'
-      break;
-    case 2:
-      err_msg='Game was already added'
-      break;
-    case 3:
-      err_msg='Wrong ID'
-      break;
-    default:
-      err_msg='Wrong format'
-  }
-  channel_id.send(err_msg)
-
-}
-
-function new_player(code,channel_id){
-  var err_msg;
-  switch(code){
-    case 1:
-      err_msg='Player added!'
-      break;
-    case 0:
-      err_msg='Wrong format. Please use : *!addplayer @player [steam_user_id] [nickname]*'
-      break;
-    case 2:
-      err_msg='Player was already added'
-      break;
-    case 3:
-      err_msg='Wrong ID'
-      break;
-    default:
-      err_msg='Wrong format'
-  }
-  channel_id.send(err_msg);
-}
-
-function del_player(correct,channel_id){
-  var err_msg;
-  switch(correct){
-    case 1:
-      err_msg='Player removed!'
-      break;
-    case 0:
-      err_msg='Wrong format. Please use : *!removeplayer @player*'
-      break;
-    case 2:
-      err_msg='Player not found'
-      break;
-    default:
-      err_msg='Wrong format'
-  }
-  channel_id.send(err_msg);
-
-}
-
-function del_game(correct,channel_id){
-  var err_msg;
-  switch(correct){
-    case 1:
-      err_msg='Game removed!'
-      break;
-    case 0:
-      err_msg='Wrong format. Please use : *!removegame game_name*'
-      break;
-    case 2:
-      err_msg='Game not found'
-      break;
-    default:
-      err_msg='Wrong format'
-  }
-  channel_id.send(err_msg);
-
-}
-
 function compare_message(message,games,users,API_Steam_key){
   const compare_string = message.content.split(" ");
   if(compare_string.length < 2 || compare_string.length > 3){
@@ -110,30 +29,6 @@ function compare_message(message,games,users,API_Steam_key){
   }
 }
 
-function list_players(users,message){
-  var to_send = 'Players list :\n'
-  users.forEach(u =>{
-    if (u.guilds.includes(message.guildId)){
-      to_send+='\t'+u.discord_id+', SteamID: '+u.steam_id+', Nickname: '+u.nickname+'\n'
-    }
-  })
-  message.channel.send(to_send)
-}
-
-function display_channel(channel){
-  channel.send(channel.id)
-}
-
-function list_games(games,message){
-  var to_send = 'Games list :\n'
-  games.forEach(g =>{
-    if (g.guilds.includes(message.guildId)){
-      to_send+='\t'+g.name+', SteamID: '+g.id+'\n'
-    }
-  })
-  message.channel.send(to_send)
-}
-
 function help(channel){
   var to_send ='Commands list :\n'
   to_send+='\t*!on*\n\tEnable the new achievements listener\n\n'
@@ -146,4 +41,4 @@ function help(channel){
   to_send+='\t*!listplayers*\n\tList the players listened list\n\n'
   channel.send(to_send)
 }
-export { display_channel, compare_message, new_game,new_player,del_player, del_game,list_players,list_games,help};
+export {compare_message,help};

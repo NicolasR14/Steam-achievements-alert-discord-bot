@@ -91,39 +91,23 @@ async function addUserDB(DiscordID,SteamID,DiscordNickname,interaction,is_new_pl
     })
 }
 
-async function removeGameDB(message,games){
-    const game_string = message.content.split(" ");
-    var gameID = false
-    //Delete from games dictionnary
-    games.forEach(game =>{
-        if(game.name === game_string[1]){
-            gameID = game.id
-            if(!game.guilds.includes(message.guildId)){
-                // del_game(2,message.channel)
-                return
-            }
-            const index = game.guilds.indexOf(message.guildId);
-            game.guilds.splice(index,1)
-            // del_game(1,message.channel)
-            return
-        }
-    })
-    if(!gameID){
-        // del_game(2,message.channel)
-    }
-    
-    ////////////////ADD CONDITION IF GUILDS == 0 il faut delete
+async function removeGameDB(gameID,guildId,nbGuildsGame,interaction){
+
     //Delete in database
     await sql.connect(configDB)
     .then(async function(poolConnection) {
-        await poolConnection.request().query(`DELETE FROM [Guilds.Games] WHERE GuildID='${message.guildId}' AND GameID='${gameID}';`)
+        await poolConnection.request().query(`DELETE FROM [Guilds.Games] WHERE GuildID='${guildId}' AND GameID='${gameID}';`)
+        if(nbGuildsGame===1){
+            await poolConnection.request().query(`DELETE FROM [Games] WHERE AppID='${gameID}';`)
+        }
         poolConnection.close();
+        await interaction.reply(`Game removed from the games list!`);
     }).catch (err => {
         console.error(err.message);
     })
 }
 
-async function removePlayerDB(userDiscordId,guildId,nbGuildsUser){
+async function removePlayerDB(userDiscordId,guildId,nbGuildsUser,interaction){
 
     //Delete in database
     await sql.connect(configDB)
@@ -133,6 +117,7 @@ async function removePlayerDB(userDiscordId,guildId,nbGuildsUser){
             await poolConnection.request().query(`DELETE FROM [Users] WHERE DiscordID='${userDiscordId}';`)
         }
         poolConnection.close();
+        await interaction.reply(`Player removed from the users list!`);
     }).catch (err => {
         console.error(err.message);
     })
