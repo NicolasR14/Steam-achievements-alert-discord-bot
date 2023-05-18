@@ -43,5 +43,9 @@ module.exports = {
 			globalVariables.Games.push(new Game(game_name,game_id,[interaction.guildId]))
 		}
 		addGameDB(interaction,game_id,game_name,find)
+		var gameObject = globalVariables.Games.find(game => game.id === game_id)
+		globalVariables.Users.map(async user => {
+			gameObject.updateAchievements(user,t_0)
+		})
 		}
 }

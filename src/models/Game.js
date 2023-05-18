@@ -13,12 +13,14 @@ class Game {
         this.nbTotal
         this.achievementsIcon = {}
     }
-    updateAchievements(user,t_0){
+    updateAchievements(user,t_0,start=false){
         return fetch(`http://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v0001/?appid=${this.id}&key=${API_Steam_key}&steamid=${user.steam_id}&l=french`)
         .then(res => {
-        if (res.ok) {
-            return res.json();
-        } else throw Error;
+            if (res.ok) {
+                return res.json();
+            } else {
+                throw (`${this.name} : ${user.nickname} error`);
+            }
         })
         .then(async value =>{
             const now = parseInt(Date.now());
@@ -31,24 +33,27 @@ class Game {
             var nb_unlocked = 0
             this.nbTotal = value.playerstats.achievements.length
             for (const a of value.playerstats.achievements){
-            //check each achievement
-            if (a.unlocktime != 0) {
-                nb_unlocked++
-                if (a.unlocktime > t_0 && !user.displayedAchievements.includes(`${this.id}_${a.apiname}`) && ((typeof this.achievements[user.steam_id] === 'undefined')) | this.achievements[user.steam_id] === 0) {
-                    //achievement is valid if it has been unlocked since bot is live and if it has not been displayed
-                    user.newAchievements.push(new Achievement(this,value.playerstats.gameName,a.apiname,a.name,a.description,user)); 
+                //check each achievement
+                if (a.unlocktime != 0) {
+                    nb_unlocked++
+                    if (a.unlocktime > t_0 && !user.displayedAchievements.includes(`${this.id}_${a.apiname}`) && ((typeof this.achievements[user.steam_id] === 'undefined') | this.achievements[user.steam_id] === 0)) {
+                        //achievement is valid if it has been unlocked since bot is live and if it has not been displayed
+                        if(!start){
+                            user.newAchievements.push(new Achievement(this,value.playerstats.gameName,a.apiname,a.name,a.description,user)); 
+                        }
+                        user.displayedAchievements.push(`${this.id}_${a.apiname}`)
+                    }
                 }
-            }
-            this.nbUnlocked[user.steam_id] = nb_unlocked
-            if(typeof this.achievements[a.apiname] === 'undefined'){
-                this.achievements[a.apiname] = {}
-            }
-            this.achievements[a.apiname][user.steam_id] = a.unlocktime
+                this.nbUnlocked[user.steam_id] = nb_unlocked
+                if(typeof this.achievements[a.apiname] === 'undefined'){
+                    this.achievements[a.apiname] = {}
+                }
+                this.achievements[a.apiname][user.steam_id] = a.unlocktime
             }
             console.log(`[${now}] Found ${user.newAchievements.length} new achievements for ${user.nickname} on ${this.name}`)
         })
         .catch(function (err) {
-        console.error("getAchievementsToDisplay error : ", err);
+        console.log(err);
         });
     }
 

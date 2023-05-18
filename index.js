@@ -6,6 +6,7 @@ const { discord_token } = require('./config/config.json');
 const {getGamesAndUsers} = require('./src/connectAndQuery.js')
 const {getAvatars,listenForNewAchievements} = require('./src/steam_interface.js')
 
+
 // Create a new client instance
 const client = new Client({ intents: [GatewayIntentBits.Guilds,GatewayIntentBits.GuildMessages,
 	GatewayIntentBits.MessageContent,
@@ -22,7 +23,8 @@ class Guild {
 var globalVariables = {
 	'Guilds':[],
 	'Users':[],
-	'Games':[]
+	'Games':[],
+	't_0':parseInt(1683531420000/1000)
 }
 
 client.once(Events.ClientReady, async c => {
@@ -32,7 +34,10 @@ client.once(Events.ClientReady, async c => {
 	console.table(globalVariables.Users)
 	console.table(globalVariables.Games)
   	getAvatars(globalVariables.Users) //to get avatars for each players
-  	listenForNewAchievements(globalVariables,t_0);
+	await Promise.all(globalVariables.Users.map(async user => {
+		await Promise.all(globalVariables.Games.map(game => game.updateAchievements(user,globalVariables.t_0,start=true))) 
+	}))
+  	listenForNewAchievements(globalVariables);
 });
 
 // Log in to Discord with your client's token
@@ -40,7 +45,6 @@ client.login(discord_token);
 // import {compare_message, list_games, list_players,help} from './src/discord_in.js'
 
 //const t_0 = parseInt(Date.now()/1000);
-const t_0 = parseInt(1683531420000/1000);
 
 client.commands = new Collection();
 const foldersPath = path.join(__dirname, 'src/commands');

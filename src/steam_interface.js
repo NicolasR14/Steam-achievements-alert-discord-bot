@@ -48,7 +48,7 @@ async function getAvatars(users) {
     });
 }
 
-function listenForNewAchievements(globalVariables,t_0){
+function listenForNewAchievements(globalVariables){
   console.log('listening to new achievements...')
 
   setInterval(async function() {
@@ -56,7 +56,9 @@ function listenForNewAchievements(globalVariables,t_0){
     
     await Promise.all(globalVariables.Users.map(async user => {
         await user.getRecentlyPlayedGames(globalVariables.Games)
-        await Promise.all(user.recentlyPlayedGames.map(game => game.updateAchievements(user,t_0))) 
+        await Promise.all(user.recentlyPlayedGames.map(game => {
+          game.updateAchievements(user,globalVariables.t_0,start=false)
+        })) 
     }))
 
     // const nb_new_achievements = Users.reduce((accumulator, user) => accumulator + user.newAchievements.length,0)
@@ -70,9 +72,8 @@ function listenForNewAchievements(globalVariables,t_0){
     }
 
     var guild;
-
+    
     for(const newA of new_achievements){
-        newA.achievementUser.displayedAchievements.push(`${newA.game.id}_${newA.achievementId}`)
         for(const guild_id of newA.achievementUser.guilds){
             guild = globalVariables.Guilds.find(g => g.id === guild_id)
             if(typeof guild === 'undefined'){
@@ -83,7 +84,6 @@ function listenForNewAchievements(globalVariables,t_0){
             }
             
             if(newA.game.guilds.includes(guild_id)){
-              console.log(guild_id)
               await newA.displayDiscordNewAchievement(globalVariables.Users,guild)
             }
         }

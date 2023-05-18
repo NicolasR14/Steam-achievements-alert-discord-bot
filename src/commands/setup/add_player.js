@@ -61,7 +61,9 @@ module.exports = {
 		}
 		addUserDB(discord_id,steam_id,nickname,interaction,is_new_player)
 			.then(()=>{
-				getAvatars([globalVariables.Users.find(user => user.discord_id === discord_id)])
+				var userObject = globalVariables.Users.find(user => user.discord_id === discord_id)
+				getAvatars([userObject])
+				globalVariables.Games.map(game => game.updateAchievements(userObject,globalVariables.t_0))
 				})	
 		}
 }

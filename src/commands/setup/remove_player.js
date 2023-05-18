@@ -19,8 +19,19 @@ module.exports = {
 					await interaction.reply('Player not in the players list for this guild!');
 					return
 				}
-				removePlayerDB(discord_id,interaction.guildId,user.guilds.length)
+				removePlayerDB(discord_id,interaction.guildId,user.guilds.length,interaction)
 				if(user.guilds.length===1){
+					for(const game of globalVariables.Games){
+						for(const achievementID of Object.keys(game.achievements)){
+							if(typeof game.achievements[achievementID][user.steam_id] != 'undefined'){
+								delete game.achievements[achievementID][user.steam_id];
+							}
+						}
+						if(typeof game.nbUnlocked[user.steam_id] != 'undefined'){
+							delete game.nbUnlocked[user.steam_id]
+						}
+						
+					}
 					const indexUser = globalVariables.Users.indexOf(user);
 					globalVariables.Users.splice(indexUser,1)
 					console.log(`${user.nickname} erased from DB`)
