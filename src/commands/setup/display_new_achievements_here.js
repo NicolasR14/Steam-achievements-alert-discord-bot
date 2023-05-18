@@ -13,6 +13,6 @@ module.exports = {
             guild.channel = interaction.channel;
             }
         })
-        console.log(globalVariables.Guilds)
+        console.table(globalVariables.Guilds)
 	},
 };

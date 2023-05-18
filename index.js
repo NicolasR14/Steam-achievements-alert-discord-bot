@@ -12,9 +12,9 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds,GatewayIntentBits
 	GatewayIntentBits.GuildMembers] });
 
 class Guild {
-  constructor(guild_id,channel_id){
+  constructor(guild_id){
     this.id = guild_id;
-    this.channel_id = channel_id;
+    this.channel_id;
     this.channel;
   }
 }
@@ -83,10 +83,14 @@ client.on(Events.InteractionCreate, async interaction => {
 	}
 });
 
+	//TO DO
+    //Quand on démarre faut que ça update pour tous les jeux et tous les joueurs
+    //Quand on ajoute un joueur il faut que ça update pour lui pour tous les jeux enregistrés
+    //Quand on ajoute un jeu on update sur tous les joueurs.
+    //Quand on delete un joueur faut delete les valeurs d'achievements résiduelles dans tous les jeux (non prioritaire)
+
+	//Update compare function
 //   if(message.content.startsWith('!tcompare ')){
 //     compare_message(message,Games,Users,API_Steam_key)
 //     return
 //   }
-//   if(message.content.startsWith('!tremovegame ')){
-//     removeGame(message,Games)
-//     return

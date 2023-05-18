@@ -28,17 +28,18 @@ class Game {
             if (!value.playerstats.hasOwnProperty("achievements")) {
                 throw Error(`${value.playerstats.gameName}` + " doesn't have achievements");
             }
-            this.nbUnlocked = 0
+            var nb_unlocked = 0
             this.nbTotal = value.playerstats.achievements.length
             for (const a of value.playerstats.achievements){
             //check each achievement
             if (a.unlocktime != 0) {
-                this.nbUnlocked++
-                if (a.unlocktime > t_0 && ((typeof this.achievements[user.steam_id] === 'undefined')) | this.achievements[user.steam_id] === 0) {
+                nb_unlocked++
+                if (a.unlocktime > t_0 && !user.displayedAchievements.includes(`${this.id}_${a.apiname}`) && ((typeof this.achievements[user.steam_id] === 'undefined')) | this.achievements[user.steam_id] === 0) {
                     //achievement is valid if it has been unlocked since bot is live and if it has not been displayed
                     user.newAchievements.push(new Achievement(this,value.playerstats.gameName,a.apiname,a.name,a.description,user)); 
                 }
             }
+            this.nbUnlocked[user.steam_id] = nb_unlocked
             if(typeof this.achievements[a.apiname] === 'undefined'){
                 this.achievements[a.apiname] = {}
             }

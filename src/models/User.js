@@ -10,6 +10,7 @@ class User {
       this.avatar;
       this.recentlyPlayedGames = [];
       this.newAchievements = [] //pour l'affichage
+      this.displayedAchievements = []
     }
     async getRecentlyPlayedGames(Games){
       this.recentlyPlayedGames = await fetch(`http://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v0001/?key=${API_Steam_key}&steamid=${this.steam_id}&format=json`)

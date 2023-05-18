@@ -1,6 +1,7 @@
 const sql = require('mssql') ;
 const config = require('../config/config.json')
 const {User} = require('../src/models/User')
+const {Game} = require('../src/models/Game')
 // const {new_game,new_player,del_player,del_game} = require('./discord_in.js')
 
 const configDB = {
@@ -14,16 +15,6 @@ const configDB = {
     },
     options: {
         encrypt: true
-    }
-}
-
-
-
-class Game {
-    constructor(name,id,guilds){
-        this.id = id;
-        this.name = name;
-        this.guilds = guilds;
     }
 }
 
