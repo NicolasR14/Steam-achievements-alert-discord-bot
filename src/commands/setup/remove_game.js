@@ -8,33 +8,33 @@ module.exports = {
 		.addStringOption(option =>
 			option.setName('game_name')
 				.setDescription('Name of the game as you specified it (do /list_games)')
-                .setRequired(true)),
-	async execute(interaction,globalVariables) {
+				.setRequired(true)),
+	async execute(interaction, globalVariables) {
 		const game_name = interaction.options.getString('game_name')
 		var find = false
-		for (game of globalVariables.Games){
-			if(game.name === game_name){
+		for (game of globalVariables.Games) {
+			if (game.name === game_name) {
 				find = true
 				console.log(`guildId : ${interaction.guildId} ; list : ${game.guilds}`)
-				if(!game.guilds.includes(interaction.guildId)){
+				if (!game.guilds.includes(interaction.guildId)) {
 					await interaction.reply('Game not in the games list for this guild!');
 					return
 				}
-				if(game.guilds.length===1){
+				if (game.guilds.length === 1) {
 					const indexGame = globalVariables.Games.indexOf(game);
-					globalVariables.Games.splice(indexGame,1)
+					globalVariables.Games.splice(indexGame, 1)
 					console.log(`${game.name} erased from DB`)
 				}
-				else{
+				else {
 					const indexGuild = game.guilds.indexOf(interaction.guildId);
-					game.guilds.splice(indexGuild,1)
+					game.guilds.splice(indexGuild, 1)
 					console.log(`${interaction.guildId} removed from ${game.name}'s guilds list`)
 				}
-				removeGameDB(game.id,interaction.guildId,game.guilds.length,interaction)
+				removeGameDB(game.id, interaction.guildId, game.guilds.length, interaction)
 				return
 			}
 		}
-		if(!find){
+		if (!find) {
 			await interaction.reply('Game not in the games list!');
 			return
 		}

@@ -1,43 +1,45 @@
 // Require the necessary discord.js classes
 const fs = require('node:fs');
 const path = require('node:path');
-const { Client,Collection, Events, GatewayIntentBits } = require('discord.js');
+const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
 const { discord_token } = require('./config/config.json');
-const {getGamesAndUsers} = require('./src/connectAndQuery.js')
-const {getAvatars,listenForNewAchievements} = require('./src/steam_interface.js')
+const { getGamesAndUsers } = require('./src/connectAndQuery.js')
+const { getAvatars, listenForNewAchievements } = require('./src/steam_interface.js')
 
 
 // Create a new client instance
-const client = new Client({ intents: [GatewayIntentBits.Guilds,GatewayIntentBits.GuildMessages,
+const client = new Client({
+	intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages,
 	GatewayIntentBits.MessageContent,
-	GatewayIntentBits.GuildMembers] });
+	GatewayIntentBits.GuildMembers]
+});
 
 class Guild {
-  constructor(guild_id){
-    this.id = guild_id;
-    this.channel_id;
-    this.channel;
-  }
+	constructor(guild_id) {
+		this.id = guild_id;
+		this.channel_id;
+		this.channel;
+	}
 }
 
 var globalVariables = {
-	'Guilds':[],
-	'Users':[],
-	'Games':[],
-	't_0':parseInt(1683531420000/1000)
+	'Guilds': [],
+	'Users': [],
+	'Games': [],
+	't_0': parseInt(1683531420000 / 1000)
 }
 
 client.once(Events.ClientReady, async c => {
 	console.log(`Ready! Logged in as ${c.user.tag}`);
 	globalVariables.Guilds = client.guilds.cache.map(guild => new Guild(guild.id));
-  	[globalVariables.Users,globalVariables.Games] = await getGamesAndUsers();
+	[globalVariables.Users, globalVariables.Games] = await getGamesAndUsers();
 	console.table(globalVariables.Users)
 	console.table(globalVariables.Games)
-  	getAvatars(globalVariables.Users) //to get avatars for each players
+	getAvatars(globalVariables.Users) //to get avatars for each players
 	await Promise.all(globalVariables.Users.map(async user => {
-		await Promise.all(globalVariables.Games.map(game => game.updateAchievements(user,globalVariables.t_0,start=true))) 
+		await Promise.all(globalVariables.Games.map(game => game.updateAchievements(user, globalVariables.t_0, start = true)))
 	}))
-  	listenForNewAchievements(globalVariables);
+	listenForNewAchievements(globalVariables);
 });
 
 // Log in to Discord with your client's token
@@ -76,7 +78,7 @@ client.on(Events.InteractionCreate, async interaction => {
 	}
 
 	try {
-		await command.execute(interaction,globalVariables);
+		await command.execute(interaction, globalVariables);
 	} catch (error) {
 		console.error(error);
 		if (interaction.replied || interaction.deferred) {
@@ -86,13 +88,6 @@ client.on(Events.InteractionCreate, async interaction => {
 		}
 	}
 });
-
-	//TO DO
-    //Quand on démarre faut que ça update pour tous les jeux et tous les joueurs
-    //Quand on ajoute un joueur il faut que ça update pour lui pour tous les jeux enregistrés
-    //Quand on ajoute un jeu on update sur tous les joueurs.
-    //Quand on delete un joueur faut delete les valeurs d'achievements résiduelles dans tous les jeux (non prioritaire)
-
 	//Update compare function
 //   if(message.content.startsWith('!tcompare ')){
 //     compare_message(message,Games,Users,API_Steam_key)

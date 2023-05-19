@@ -3,8 +3,59 @@ const { SlashCommandBuilder } = require('discord.js');
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('compare_achievements')
-		.setDescription('Replies with Pong!'),
-	async execute(interaction) {
-		await interaction.reply('Pong!');
-	},
+		.setDescription('Shows achievements locked for you that are unlocked for other players')
+		.addStringOption(option =>
+			option.setName('game_name')
+				.setDescription('name of the game as you specified it (do /list_games)')
+				.setRequired(true))
+		.addUserOption(option =>
+			option.setName('player_mention')
+				.setDescription('mention a player if you want to show only its achievements')
+				.setRequired(false)),
+	async execute(interaction, globalVariables) {
+		const user_vs = interaction.options.getUser('player_mention')
+		const game_name = interaction.options.getString('game_name')
+		const gameObject = globalVariables.Games.find(game => game.name === game_name)
+		if (typeof gameObject === 'undefined') {
+			await interaction.reply('Game not found!');
+			return
+		}
+		if (!gameObject.guilds.includes(interaction.guildId)) {
+			await interaction.reply('Game not in the guild list!');
+			return
+		}
+		const userAuthor = globalVariables.Users.find(user => user.discord_id === interaction.user.id);
+		if (typeof userAuthor === 'undefined') {
+			await interaction.reply("You are not in players list. Use */addplayer* command")
+			return
+		}
+		var users_vs;
+		if (user_vs != null) {
+			if (user_vs.id === interaction.user.id) {
+				await interaction.reply("You can't compare against yourself!");
+				return
+			}
+			const userVsObject = globalVariables.Users.find(user => user.discord_id === user_vs.id)
+			if (typeof userVsObject === 'undefined') {
+				await interaction.reply('User vs. not in the guild list!');
+				return
+			}
+			else {
+				users_vs = [userVsObject]
+			}
+		}
+		else {
+			users_vs = globalVariables.Users.filter(user => {
+				if (user.guilds.includes(interaction.guildId) && user.discord_id != interaction.user.id) {
+					return true
+				}
+				return false
+			})
+
+		}
+		await Promise.all([gameObject.updateGlobalPercentage(), gameObject.getAchievementsIcon()])
+		gameObject.displayProgressionBar(interaction)
+		gameObject.compareAchievements(globalVariables, userAuthor, users_vs)
+		await interaction.reply('ok');
+	}
 };
