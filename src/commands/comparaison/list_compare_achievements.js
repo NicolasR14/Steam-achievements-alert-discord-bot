@@ -35,7 +35,7 @@ module.exports = {
 				await interaction.reply("You can't compare against yourself!");
 				return
 			}
-			const userVsObject = globalVariables.Users.find(user => user.discord_id === user_vs.id)
+			const userVsObject = globalVariables.Users.find(user => user.discord_id === user_vs.id && user.guilds.includes(interaction.guildId))
 			if (typeof userVsObject === 'undefined') {
 				await interaction.reply('User vs. not in the guild list!');
 				return
@@ -46,6 +46,7 @@ module.exports = {
 		}
 		else {
 			users_vs = globalVariables.Users.filter(user => {
+
 				if (user.guilds.includes(interaction.guildId) && user.discord_id != interaction.user.id) {
 					return true
 				}
