@@ -102,7 +102,7 @@ class Game {
             });
     }
     compareAchievements(userAuthor, users_vs, interaction) {
-        const validAchievements = Object.entries(this.achievements).map(([a_id, a]) => {
+        var validAchievements = Object.entries(this.achievements).map(([a_id, a]) => {
             // console.log(a_id, a)
             if (a.playersUnlockTime[userAuthor.steam_id] === 0) {
                 const playersWhoUnlocked = Object.entries(a.playersUnlockTime).map(([u, unlocked_time]) => {
@@ -122,7 +122,7 @@ class Game {
         if (users_vs.length === 1) {
             vs1 = users_vs[0]
         }
-        console.log(validAchievements)
+
         this.displayLockedAchievements(validAchievements, interaction, ['Locked achievements for', 'locked'], userAuthor, vs1)
     }
 
@@ -175,6 +175,12 @@ class Game {
         if (achievements_locked.length === 0) {
             return
         }
+
+        achievements_locked.sort(function (a, b) {
+            return parseFloat(b.object.globalPercentage) - parseFloat(a.object.globalPercentage)
+        })
+
+
         await Promise.all(achievements_locked.map(async (achievement) => {
             achievement.object.icon = await Canvas.loadImage(achievement.object.icon)
         }))
@@ -196,13 +202,14 @@ class Game {
                 context.fillText(a.object.achievementName, 100, 68 + n * SPACE_BETWEEN) //TITRE
                 // context.fillText("Unlocked by ", 100+context.measureText(a[1][2]).width+10, 68+n*SPACE_BETWEEN);
                 context.fillStyle = '#bfbfbf';
-                var index = 0
+
                 const title_width = context.measureText(a.object.achievementName).width
-                a.playersWhoUnlocked.map(async (user_a) => {
-                    context.drawImage(user_a.avatar, 100 + title_width + 10 + 40 * index, 46 + n * SPACE_BETWEEN, 30, 30);
-                    index++
+                context.fillText(`(${a.object.globalPercentage}%)`, 100 + title_width + 10, 68 + n * SPACE_BETWEEN)
+                const globalPercentage_width = context.measureText(`(${a.object.globalPercentage}%)`).width
+
+                a.playersWhoUnlocked.map(async (user_a, index) => {
+                    context.drawImage(user_a.avatar, 100 + title_width + globalPercentage_width + 20 + 40 * index, 46 + n * SPACE_BETWEEN, 30, 30);
                 })
-                const txt = `(${a.object.globalPercentage}%)`;
                 // context.fillText(txt, 100 + title_width + 10 + 40 * index, 68 + n * SPACE_BETWEEN);
 
 
@@ -232,7 +239,7 @@ class Game {
         let currentIndex = 0
         collector.on('collect', async interaction => {
             // Increase/decrease index
-            interaction.customId === backButton.customId ? (currentIndex -= MAX_PAGE) : (currentIndex += MAX_PAGE)
+            interaction.customId === backButton.data.custom_id ? (currentIndex = currentIndex - MAX_PAGE) : (currentIndex = currentIndex + MAX_PAGE)
             // Respond to interaction by updating message with new embed
             const slice_achievements = achievements_locked.slice(currentIndex, currentIndex + 5)
 
