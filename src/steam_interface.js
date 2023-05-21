@@ -89,7 +89,7 @@ function listenForNewAchievements(globalVariables) {
       user.newAchievements = []
     }
 
-  }, 15000)
+  }, 60000)
 }
 
 module.exports = { getAvatars, listenForNewAchievements, isPublicProfile };
