@@ -29,7 +29,7 @@ class User {
         })
       })
       .catch(function (err) {
-        console.error("API error getRecentlyPlayedGames", err);
+        console.error("API error getPlaytime", err);
       });
   }
 
