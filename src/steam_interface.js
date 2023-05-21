@@ -51,12 +51,12 @@ function listenForNewAchievements(globalVariables) {
   setInterval(async function () {
     console.log(`//////////////////////////////\nGames list : ${globalVariables.Games.map(game => game.name)}`)
 
-    globalVariables.Users.map(async user => {
+    await Promise.all(globalVariables.Users.map(async user => {
       await user.getRecentlyPlayedGames(globalVariables.Games)
-      user.recentlyPlayedGames.map(async game => {
+      await Promise.all(user.recentlyPlayedGames.map(async game => {
         await game.updateAchievements(user, globalVariables.t_0, start = false)
-      })
-    })
+      }))
+    }))
 
     const new_achievements = globalVariables.Users.map(user => user.newAchievements.map(a => [user, a])).flat(1);
     console.log(new_achievements.length)

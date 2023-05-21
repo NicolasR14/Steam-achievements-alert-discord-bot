@@ -34,20 +34,22 @@ class User {
   }
 
   async getRecentlyPlayedGames(Games) {
-    this.recentlyPlayedGames = await fetch(`http://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v0001/?key=${API_Steam_key}&steamid=${this.steam_id}&format=json`)
+    return await fetch(`http://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v0001/?key=${API_Steam_key}&steamid=${this.steam_id}&format=json`)
       .then(function (res) {
         if (res.ok) {
           return res.json();
         } else throw Error;
       })
       .then((value) => {
-        return value.response.games.map(game => {
+        this.recentlyPlayedGames = value.response.games.map(game => {
           var matchGame = Games.find(g => g.id === String(game.appid))
           if (matchGame) {
             this.timePlayedByGame[game.appid] = parseInt(parseInt(game.playtime_forever) / 60)
             return matchGame
           }
         }).filter(notUndefined => notUndefined !== undefined);
+        console.log(`Recently played games for ${this.nickname} : ${this.recentlyPlayedGames}`)
+        return this.recentlyPlayedGames
       })
       .catch(function (err) {
         console.error("API error getRecentlyPlayedGames", err);
