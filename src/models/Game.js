@@ -129,7 +129,8 @@ class Game {
         var validAchievements = Object.entries(this.achievements).map(([a_id, a]) => {
             if (a.playersUnlockTime[userAuthor.steam_id] === 0) {
                 const playersWhoUnlocked = Object.entries(a.playersUnlockTime).map(([u, unlocked_time]) => {
-                    if (unlocked_time != 0) {
+                    const userObject = globalVariables.Users.find(_u => _u.steam_id === u)
+                    if (unlocked_time != 0 && userObject.guilds.includes(interaction.guildId)) {
                         return globalVariables.Users.find(_u => _u.steam_id === u)
                     }
                 }).filter(notUndefined => notUndefined !== undefined);
@@ -146,7 +147,8 @@ class Game {
     listAllAchievements(interaction, globalVariables) {
         var validAchievements = Object.entries(this.achievements).map(([a_id, a]) => {
             const playersWhoUnlocked = Object.entries(a.playersUnlockTime).map(([u, unlocked_time]) => {
-                if (unlocked_time != 0) {
+                const userObject = globalVariables.Users.find(_u => _u.steam_id === u)
+                if (unlocked_time != 0 && userObject.guilds.includes(interaction.guildId)) {
                     return globalVariables.Users.find(_u => _u.steam_id === u)
                 }
             }).filter(notUndefined => notUndefined !== undefined);
@@ -167,7 +169,7 @@ class Game {
         [background, blue_bar, black_bar, grey_bar] = await Promise.all([Canvas.loadImage('./assets/background.jpg'), Canvas.loadImage('./assets/blue_progress_bar.png'),
         Canvas.loadImage('./assets/black_progress_bar.png'), Canvas.loadImage('./assets/grey_progress_bar.png')])
 
-        var users_nb_unlocked_not_null = Object.entries(this.nbUnlocked).filter(([k, v]) => v.nbUnlocked !== 0)
+        var users_nb_unlocked_not_null = Object.entries(this.nbUnlocked).filter(([k, v]) => v.nbUnlocked !== 0 && v.user.guilds.includes(interaction.guildId))
         Canvas.registerFont('./assets/OpenSans-VariableFont_wdth,wght.ttf', { family: 'Open Sans Regular' })
         const canvas = Canvas.createCanvas(700, 115 + (users_nb_unlocked_not_null.length - 1) * 70);
         const context = canvas.getContext('2d');

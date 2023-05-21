@@ -48,7 +48,7 @@ class User {
             return matchGame
           }
         }).filter(notUndefined => notUndefined !== undefined);
-        console.log(`Recently played games for ${this.nickname} : ${this.recentlyPlayedGames}`)
+        console.log(`Recently played games for ${this.nickname} : ${this.recentlyPlayedGames.map(g => g.id)}`)
         return this.recentlyPlayedGames
       })
       .catch(function (err) {
