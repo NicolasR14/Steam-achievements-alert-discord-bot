@@ -1,7 +1,8 @@
 const fetch = require('node-fetch');
-const { API_Steam_key } = require('../../config/config.json')
+const { API_Steam_key } = require('../../config.json')
 const { Achievement } = require('./Achievement.js')
 const { AttachmentBuilder, EmbedBuilder, ActionRowBuilder } = require('discord.js');
+const { backButton, forwardButton } = require('../../assets/buttons')
 const printAtWordWrap = require('../../assets/utils')
 const Canvas = require('canvas')
 
@@ -11,14 +12,12 @@ class Game {
         this.name = name;
         this.realName = ''
         this.guilds = guilds;
-        this.achievements = {} //Double dictionnaire avec en première couche l'id des achievements et en seconde les joueurs
-        this.globalPercentages = {} //Dictionnaire achievements
+        this.achievements = {} //Dictionnaire clé id achievements et valeur l'objets de l'achievement
         this.nbUnlocked = {} //Dictionnaire user steam id
         this.nbTotal
-        this.achievementsIcon = {}
     }
-    updateAchievements(user, t_0, start = false) {
-        return fetch(`http://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v0001/?appid=${this.id}&key=${API_Steam_key}&steamid=${user.steam_id}&l=french`)
+    async updateAchievements(user, t_0, start = false) {
+        return await fetch(`http://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v0001/?appid=${this.id}&key=${API_Steam_key}&steamid=${user.steam_id}&l=french`)
             .then(res => {
                 if (res.ok) {
                     return res.json();
@@ -35,27 +34,30 @@ class Game {
                     throw Error(`${value.playerstats.gameName}` + " doesn't have achievements");
                 }
                 var nb_unlocked = 0
+                var nb_new_achievements = 0
                 this.nbTotal = value.playerstats.achievements.length
                 this.realName = value.playerstats.gameName
                 for (const a of value.playerstats.achievements) {
                     //check each achievement
+                    if (typeof this.achievements[a.apiname] === 'undefined') {
+                        this.achievements[a.apiname] = new Achievement(this, a.apiname, a.name, a.description)
+                    }
+
+                    this.achievements[a.apiname].playersUnlockTime[user.steam_id] = a.unlocktime
                     if (a.unlocktime != 0) {
                         nb_unlocked++
-                        if (a.unlocktime > t_0 && !user.displayedAchievements.includes(`${this.id}_${a.apiname}`) && ((typeof this.achievements[user.steam_id] === 'undefined') | this.achievements[user.steam_id] === 0)) {
+                        if (a.unlocktime > t_0 && !user.displayedAchievements.includes(`${this.id}_${a.apiname}`)) {
                             //achievement is valid if it has been unlocked since bot is live and if it has not been displayed
                             if (!start) {
-                                user.newAchievements.push(new Achievement(this, value.playerstats.gameName, a.apiname, a.name, a.description, user));
+                                user.newAchievements.push(this.achievements[a.apiname]);
+                                nb_new_achievements++
                             }
                             user.displayedAchievements.push(`${this.id}_${a.apiname}`)
                         }
                     }
-                    this.nbUnlocked[user] = nb_unlocked
-                    if (typeof this.achievements[a.apiname] === 'undefined') {
-                        this.achievements[a.apiname] = {}
-                    }
-                    this.achievements[a.apiname][user.steam_id] = a.unlocktime
                 }
-                console.log(`[${now}] Found ${user.newAchievements.length} new achievements for ${user.nickname} on ${this.name}`)
+                this.nbUnlocked[user.steam_id] = { nbUnlocked: nb_unlocked, user: user }
+                console.log(`[${now}] Found ${nb_new_achievements} new achievements for ${user.nickname} on ${this.name}`)
             })
             .catch(function (err) {
                 console.log(err);
@@ -71,7 +73,7 @@ class Game {
             })
             .then(value => {
                 for (const a of value.achievementpercentages.achievements) {
-                    this.globalPercentages[a.name] = parseFloat(a.percent).toFixed(1);
+                    this.achievements[a.name].globalPercentage = parseFloat(a.percent).toFixed(1);
                 }
             })
             .catch(function (err) {
@@ -92,33 +94,36 @@ class Game {
             })
             .then(value => {
                 for (const a of value.game.availableGameStats.achievements) {
-                    this.achievementsIcon[a.name] = a.icon;
+                    this.achievements[a.name].icon = a.icon;
                 }
             })
             .catch(function (err) {
                 console.error("getAchievementIcon error : ", err);
             });
     }
-    compareAchievements(globalVariables, userAuthor, users_vs, interaction) {
-        const validAchievements = Object.entries(this.achievements).map(([a_id, u]) => {
-            if (u[userAuthor.steam_id] === 0) {
-                const playersWhoUnlocked = Object.entries(u).filter(([_u, unlocked_time]) => {
-                    // console.log(unlocked_time, users_vs, _u)
-                    if (unlocked_time != 0 && users_vs.map(__u => __u.steam_id).includes(_u)) {
-                        return true
+    compareAchievements(userAuthor, users_vs, interaction) {
+        const validAchievements = Object.entries(this.achievements).map(([a_id, a]) => {
+            // console.log(a_id, a)
+            if (a.playersUnlockTime[userAuthor.steam_id] === 0) {
+                const playersWhoUnlocked = Object.entries(a.playersUnlockTime).map(([u, unlocked_time]) => {
+                    // console.log(u.steam_id, unlocked_time)
+                    if (unlocked_time != 0 && users_vs.map(_u => _u.steam_id).includes(u)) {
+                        return users_vs.find(_u => _u.steam_id === u)
                     }
-                }).map(([_u, unlocked_time]) => globalVariables.Users.find(__u => __u.steam_id === _u))
+                }).filter(notUndefined => notUndefined !== undefined);
                 // console.log(`playersWhoUnlocked : ${playersWhoUnlocked}`)
                 if (playersWhoUnlocked.length > 0) {
-                    return { id: a_id, playersWhoUnlocked: playersWhoUnlocked, icon: this.achievementsIcon[a_id], globalPercentages: this.globalPercentages[a_id] }
+                    return { object: a, playersWhoUnlocked: playersWhoUnlocked }
                 }
             }
 
         }).filter(notUndefined => notUndefined !== undefined);
+        var vs1;
+        if (users_vs.length === 1) {
+            vs1 = users_vs[0]
+        }
         console.log(validAchievements)
-
-        // displayProgressionBar(interaction)
-        //Si validAchievment.length == 0 priunt you are alone noob
+        this.displayLockedAchievements(validAchievements, interaction, ['Locked achievements for', 'locked'], userAuthor, vs1)
     }
 
     async displayProgressionBar(interaction) {
@@ -126,7 +131,7 @@ class Game {
         const blue_bar = await Canvas.loadImage('./assets/blue_progress_bar.png')
         const black_bar = await Canvas.loadImage('./assets/black_progress_bar.png')
 
-        var users_nb_unlocked_not_null = Object.entries(this.nbUnlocked).filter(([u, nb]) => nb !== 0)
+        var users_nb_unlocked_not_null = Object.entries(this.nbUnlocked).filter(([k, v]) => v.nbUnlocked !== 0)
         Canvas.registerFont('./assets/OpenSans-VariableFont_wdth,wght.ttf', { family: 'Open Sans Regular' })
         const canvas = Canvas.createCanvas(700, 115 + (users_nb_unlocked_not_null.length - 1) * 70);
         const context = canvas.getContext('2d');
@@ -134,8 +139,8 @@ class Game {
         context.drawImage(background, 0, 0);
 
         var sorted = [];
-        for (var [u, nb_unlocked] of users_nb_unlocked_not_null) {
-            sorted.push([u, nb_unlocked]);
+        for (var [k, v] of users_nb_unlocked_not_null) {
+            sorted.push([v.user, v.nbUnlocked]);
         }
         sorted.sort(function (a, b) {
             return b[1] - a[1]
@@ -149,23 +154,103 @@ class Game {
         context.fillStyle = '#ffffff';
         context.fillText("Progress on " + this.realName, 25, 35);
 
-        users_nb_unlocked_not_null.forEach(([user, nb_unlocked]) => {
-            context.drawImage(user.avatar, 25, 50 + n * 70, 50, 50);
+        users_nb_unlocked_not_null.forEach((v) => {
+
+            context.drawImage(v[0].avatar, 25, 50 + n * 70, 50, 50);
             context.font = '20px "Open Sans Regular"';
             context.fillStyle = '#bfbfbf';
-            context.fillText(nb_unlocked + "/" + this.nbTotal + " unlocked achievements (" + (parseInt(100 * nb_unlocked / this.nbTotal)) + "%)", 100, 65 + n * 70);
+            context.fillText(v[1] + "/" + this.nbTotal + " unlocked achievements (" + (parseInt(100 * v[1] / this.nbTotal)) + "%)", 100, 65 + n * 70);
             context.drawImage(black_bar, 100, 80 + n * 70, 575, 20);
-            context.drawImage(blue_bar, 100, 80 + n * 70, 575 * nb_unlocked / this.nbTotal, 20);
+            context.drawImage(blue_bar, 100, 80 + n * 70, 575 * v[1] / this.nbTotal, 20);
             n += 1;
         })
 
         attachment = new AttachmentBuilder(canvas.toBuffer())
-        message.channel.send({ files: [attachment] })
+        await interaction.reply({ files: [attachment] });
+    }
+
+    async displayLockedAchievements(achievements_locked, interaction, filterAchievement, userAuthor, vs1) {
+        const MAX_PAGE = 5
+        const background = await Canvas.loadImage('./assets/background.jpg')
+        if (achievements_locked.length === 0) {
+            return
+        }
+        await Promise.all(achievements_locked.map(async (achievement) => {
+            achievement.object.icon = await Canvas.loadImage(achievement.object.icon)
+        }))
+        function get_embedded_img(achievements_fraction, startAnb, endAnb) {
+            const SPACE_BETWEEN = 90
+            const canvas = Canvas.createCanvas(700, 135 + (achievements_fraction.length - 1) * SPACE_BETWEEN);
+            const context = canvas.getContext('2d');
+            context.drawImage(background, 0, 0);
+            context.font = '22px "Open Sans Regular"';
+            context.fillStyle = '#ffffff';
+            context.fillText(`${filterAchievement[0]} ${userAuthor.nickname} vs. ${typeof vs1 === 'undefined' ? 'all' : vs1.nickname} ${startAnb} -${endAnb} out of ${achievements_locked.length} `, 20, 35);
+            var n = 0;
+
+            achievements_fraction.forEach(function (a) {
+                context.drawImage(a.object.icon, 20, 53 + n * SPACE_BETWEEN, 60, 60);
+
+                context.font = '20px "Open Sans Regular"';
+                context.fillStyle = '#67d4f4';
+                context.fillText(a.object.achievementName, 100, 68 + n * SPACE_BETWEEN) //TITRE
+                // context.fillText("Unlocked by ", 100+context.measureText(a[1][2]).width+10, 68+n*SPACE_BETWEEN);
+                context.fillStyle = '#bfbfbf';
+                var index = 0
+                const title_width = context.measureText(a.object.achievementName).width
+                a.playersWhoUnlocked.map(async (user_a) => {
+                    context.drawImage(user_a.avatar, 100 + title_width + 10 + 40 * index, 46 + n * SPACE_BETWEEN, 30, 30);
+                    index++
+                })
+                const txt = `(${a.object.globalPercentage}%)`;
+                // context.fillText(txt, 100 + title_width + 10 + 40 * index, 68 + n * SPACE_BETWEEN);
+
+
+                printAtWordWrap(context, a.object.achievementDescription, 100, 96 + n * SPACE_BETWEEN, 20, 580)
+                // context.fillText(, 100, 96+n*70);
+
+                n += 1;
+            })
+            return new AttachmentBuilder(canvas.toBuffer(), 'img_part2.png')
+        }
+
+        const canFitOnOnePage = achievements_locked.length <= MAX_PAGE
+        const slice_achievements = achievements_locked.slice(0, 0 + 5)
+        const embedMessage = await interaction.channel.send({
+            embeds: [new EmbedBuilder().setTitle(`Showing ${filterAchievement[1]} achievements ${1} -${slice_achievements.length} out of ${achievements_locked.length} ${filterAchievement === 'locked' ? userAuthor.nickname : ''} `)],
+            files: [get_embedded_img(slice_achievements, 1, slice_achievements.length)],
+            components: canFitOnOnePage
+                ? []
+                : [new ActionRowBuilder({ components: [forwardButton] })]
+        })
+        // Exit if there is only one page of guilds (no need for all of this)
+        if (canFitOnOnePage) return
+
+        // Collect button interactions (when a user clicks a button)
+        const collector = embedMessage.createMessageComponentCollector()
+
+        let currentIndex = 0
+        collector.on('collect', async interaction => {
+            // Increase/decrease index
+            interaction.customId === backButton.customId ? (currentIndex -= MAX_PAGE) : (currentIndex += MAX_PAGE)
+            // Respond to interaction by updating message with new embed
+            const slice_achievements = achievements_locked.slice(currentIndex, currentIndex + 5)
+
+            await interaction.update({
+                embeds: [new EmbedBuilder().setTitle(`Showing ${filterAchievement[1]} achievements ${currentIndex + 1} -${currentIndex + slice_achievements.length} out of ${achievements_locked.length} ${filterAchievement === 'locked' ? 'for ' + userAuthor.nickname : ''} `)],
+                files: [get_embedded_img(slice_achievements, currentIndex + 1, currentIndex + slice_achievements.length)],
+                components: [
+                    new ActionRowBuilder({
+                        components: [
+                            // back button if it isn't the start
+                            ...(currentIndex ? [backButton] : []),
+                            // forward button if it isn't the end
+                            ...(currentIndex + MAX_PAGE < achievements_locked.length ? [forwardButton] : [])
+                        ]
+                    })
+                ]
+            })
+        })
     }
 }
-
-// displayLockedAchievements(achievements) {
-
-// }
-
 module.exports = { Game }

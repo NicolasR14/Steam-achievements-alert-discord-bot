@@ -1,15 +1,15 @@
-import {ButtonBuilder} from 'discord.js';
+const { ButtonBuilder, ButtonStyle } = require('discord.js');
 const backButton = new ButtonBuilder({
-          style: 'SECONDARY',
-          label: 'Back',
-          emoji: '⬅️',
-          customId: 'back'
-        })
+  style: ButtonStyle.Secondary,
+  label: 'Back',
+  emoji: '⬅️',
+  customId: 'back'
+})
 const forwardButton = new ButtonBuilder({
-      style: 'SECONDARY',
-      label: 'Forward',
-      emoji: '➡️',
-      customId: 'forward'
-    })
+  style: ButtonStyle.Secondary,
+  label: 'Forward',
+  emoji: '➡️',
+  customId: 'forward'
+})
 
-export {backButton,forwardButton};
+module.exports = { backButton, forwardButton };

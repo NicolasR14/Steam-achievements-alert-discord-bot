@@ -2,9 +2,10 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
-const { discord_token } = require('./config/config.json');
+const { discord_token } = require('./config.json');
 const { getGamesAndUsers } = require('./src/connectAndQuery.js')
 const { getAvatars, listenForNewAchievements } = require('./src/steam_interface.js')
+const { Guild } = require('./src/models/Guild')
 
 
 // Create a new client instance
@@ -14,20 +15,13 @@ const client = new Client({
 	GatewayIntentBits.GuildMembers]
 });
 
-class Guild {
-	constructor(guild_id) {
-		this.id = guild_id;
-		this.channel_id;
-		this.channel;
-	}
-}
-
 var globalVariables = {
 	'Guilds': [],
 	'Users': [],
 	'Games': [],
-	't_0': parseInt(1683531420000 / 1000)
+	't_0': parseInt(Date.now() / 1000)
 }
+
 
 client.once(Events.ClientReady, async c => {
 	console.log(`Ready! Logged in as ${c.user.tag}`);
@@ -44,9 +38,6 @@ client.once(Events.ClientReady, async c => {
 
 // Log in to Discord with your client's token
 client.login(discord_token);
-// import {compare_message, list_games, list_players,help} from './src/discord_in.js'
-
-//const t_0 = parseInt(Date.now()/1000);
 
 client.commands = new Collection();
 const foldersPath = path.join(__dirname, 'src/commands');
@@ -88,8 +79,3 @@ client.on(Events.InteractionCreate, async interaction => {
 		}
 	}
 });
-	//Update compare function
-//   if(message.content.startsWith('!tcompare ')){
-//     compare_message(message,Games,Users,API_Steam_key)
-//     return
-//   }
