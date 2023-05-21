@@ -63,6 +63,7 @@ module.exports = {
 			.then(() => {
 				var userObject = globalVariables.Users.find(user => user.discord_id === discord_id)
 				getAvatars([userObject])
+				userObject.getPlaytime(globalVariables.Games)
 				globalVariables.Games.map(game => game.updateAchievements(userObject, globalVariables.t_0))
 			})
 	}

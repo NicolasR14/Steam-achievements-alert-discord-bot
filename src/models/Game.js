@@ -4,7 +4,7 @@ const { Achievement } = require('./Achievement.js')
 const { AttachmentBuilder, EmbedBuilder, ActionRowBuilder } = require('discord.js');
 const { backButton, forwardButton } = require('../../assets/buttons')
 const printAtWordWrap = require('../../assets/utils')
-const Canvas = require('canvas')
+const Canvas = require('canvas');
 
 class Game {
     constructor(name, id, guilds) {
@@ -13,7 +13,7 @@ class Game {
         this.realName = ''
         this.guilds = guilds;
         this.achievements = {} //Dictionnaire clé id achievements et valeur l'objets de l'achievement
-        this.nbUnlocked = {} //Dictionnaire user steam id
+        this.nbUnlocked = {} //Dictionnaire user steam id avec l'objet user
         this.nbTotal
     }
     async updateAchievements(user, t_0, start = false) {
@@ -160,9 +160,12 @@ class Game {
     }
 
     async displayProgressionBar(interaction) {
-        const background = await Canvas.loadImage('./assets/background.jpg')
-        const blue_bar = await Canvas.loadImage('./assets/blue_progress_bar.png')
-        const black_bar = await Canvas.loadImage('./assets/black_progress_bar.png')
+        var background
+        var black_bar
+        var blue_bar
+        var orange_bar
+        [background, blue_bar, black_bar, orange_bar] = await Promise.all([Canvas.loadImage('./assets/background.jpg'), Canvas.loadImage('./assets/blue_progress_bar.png'),
+        Canvas.loadImage('./assets/black_progress_bar.png'), Canvas.loadImage('./assets/orange_progress_bar.png')])
 
         var users_nb_unlocked_not_null = Object.entries(this.nbUnlocked).filter(([k, v]) => v.nbUnlocked !== 0)
         Canvas.registerFont('./assets/OpenSans-VariableFont_wdth,wght.ttf', { family: 'Open Sans Regular' })
@@ -187,14 +190,20 @@ class Game {
         context.fillStyle = '#ffffff';
         context.fillText("Progress on " + this.realName, 25, 35);
 
-        users_nb_unlocked_not_null.forEach((v) => {
+        const tps_max = Math.max(...users_nb_unlocked_not_null.map(u => { return u[0].timePlayedByGame[this.id] }))
 
+        const barLength = 480
+
+        users_nb_unlocked_not_null.forEach((v) => {
             context.drawImage(v[0].avatar, 25, 50 + n * 70, 50, 50);
-            context.font = '20px "Open Sans Regular"';
+            context.font = '15px "Open Sans Regular"';
             context.fillStyle = '#bfbfbf';
-            context.fillText(v[1] + "/" + this.nbTotal + " unlocked achievements (" + (parseInt(100 * v[1] / this.nbTotal)) + "%)", 100, 65 + n * 70);
-            context.drawImage(black_bar, 100, 80 + n * 70, 575, 20);
-            context.drawImage(blue_bar, 100, 80 + n * 70, 575 * v[1] / this.nbTotal, 20);
+            context.fillText(`${v[1]}/${this.nbTotal} (${parseInt(100 * v[1] / this.nbTotal)}%)`, 100 + barLength + 10, 73 + n * 70);
+            context.drawImage(black_bar, 100, 60 + n * 70, barLength, 15);
+            context.drawImage(orange_bar, 100, 60 + n * 70, barLength * v[1] / this.nbTotal, 15);
+            context.fillText(`${v[0].timePlayedByGame[this.id]} h`, 100 + barLength + 10, 93 + n * 70);
+            context.drawImage(black_bar, 100, 80 + n * 70, barLength, 15);
+            context.drawImage(blue_bar, 100, 80 + n * 70, barLength * v[0].timePlayedByGame[this.id] / tps_max, 15)
             n += 1;
         })
 

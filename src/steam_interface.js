@@ -52,9 +52,9 @@ function listenForNewAchievements(globalVariables) {
     console.log(`//////////////////////////////\nGames list : ${globalVariables.Games.map(game => game.name)}`)
 
     globalVariables.Users.map(async user => {
+      await user.getPlaytime(globalVariables.Games)
       await user.getRecentlyPlayedGames(globalVariables.Games)
       user.recentlyPlayedGames.map(async game => {
-        console.log('1')
         await game.updateAchievements(user, globalVariables.t_0, start = false)
       })
     })

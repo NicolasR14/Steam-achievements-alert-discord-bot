@@ -31,7 +31,8 @@ client.once(Events.ClientReady, async c => {
 	console.table(globalVariables.Games)
 	getAvatars(globalVariables.Users) //to get avatars for each players
 	await Promise.all(globalVariables.Users.map(async user => {
-		await Promise.all(globalVariables.Games.map(game => game.updateAchievements(user, globalVariables.t_0, start = true)))
+		await user.getPlaytime(globalVariables.Games)
+		await Promise.all(globalVariables.Games.map(game => { game.updateAchievements(user, globalVariables.t_0, start = true) }))
 	}))
 	listenForNewAchievements(globalVariables);
 });
