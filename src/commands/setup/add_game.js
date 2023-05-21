@@ -45,7 +45,7 @@ module.exports = {
 		var gameObject = globalVariables.Games.find(game => game.id === game_id)
 		globalVariables.Users.map(async user => {
 			user.getPlaytime(globalVariables.Games)
-			gameObject.updateAchievements(user, t_0)
+			gameObject.updateAchievements(user, globalVariables.t_0)
 		})
 	}
 }
