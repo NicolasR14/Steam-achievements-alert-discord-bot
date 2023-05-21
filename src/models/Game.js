@@ -163,9 +163,9 @@ class Game {
         var background
         var black_bar
         var blue_bar
-        var orange_bar
-        [background, blue_bar, black_bar, orange_bar] = await Promise.all([Canvas.loadImage('./assets/background.jpg'), Canvas.loadImage('./assets/blue_progress_bar.png'),
-        Canvas.loadImage('./assets/black_progress_bar.png'), Canvas.loadImage('./assets/orange_progress_bar.png')])
+        var grey_bar
+        [background, blue_bar, black_bar, grey_bar] = await Promise.all([Canvas.loadImage('./assets/background.jpg'), Canvas.loadImage('./assets/blue_progress_bar.png'),
+        Canvas.loadImage('./assets/black_progress_bar.png'), Canvas.loadImage('./assets/grey_progress_bar.png')])
 
         var users_nb_unlocked_not_null = Object.entries(this.nbUnlocked).filter(([k, v]) => v.nbUnlocked !== 0)
         Canvas.registerFont('./assets/OpenSans-VariableFont_wdth,wght.ttf', { family: 'Open Sans Regular' })
@@ -195,15 +195,15 @@ class Game {
         const barLength = 480
 
         users_nb_unlocked_not_null.forEach((v) => {
-            context.drawImage(v[0].avatar, 25, 50 + n * 70, 50, 50);
+            context.drawImage(v[0].avatar, 25, 48 + n * 70, 50, 50);
             context.font = '15px "Open Sans Regular"';
             context.fillStyle = '#bfbfbf';
-            context.fillText(`${v[1]}/${this.nbTotal} (${parseInt(100 * v[1] / this.nbTotal)}%)`, 100 + barLength + 10, 73 + n * 70);
-            context.drawImage(black_bar, 100, 60 + n * 70, barLength, 15);
-            context.drawImage(orange_bar, 100, 60 + n * 70, barLength * v[1] / this.nbTotal, 15);
-            context.fillText(`${v[0].timePlayedByGame[this.id]} h`, 100 + barLength + 10, 93 + n * 70);
-            context.drawImage(black_bar, 100, 80 + n * 70, barLength, 15);
-            context.drawImage(blue_bar, 100, 80 + n * 70, barLength * v[0].timePlayedByGame[this.id] / tps_max, 15)
+            context.fillText(`${v[1]}/${this.nbTotal} (${parseInt(100 * v[1] / this.nbTotal)}%)`, 100 + barLength + 10, 71 + n * 70);
+            context.drawImage(black_bar, 100, 58 + n * 70, barLength, 15);
+            context.drawImage(blue_bar, 100, 58 + n * 70, barLength * v[1] / this.nbTotal, 15);
+            context.fillText(`${v[0].timePlayedByGame[this.id]} h`, 100 + barLength + 10, 91 + n * 70);
+            context.drawImage(black_bar, 100, 78 + n * 70, barLength, 15);
+            context.drawImage(grey_bar, 100, 78 + n * 70, barLength * v[0].timePlayedByGame[this.id] / tps_max, 15)
             n += 1;
         })
 
