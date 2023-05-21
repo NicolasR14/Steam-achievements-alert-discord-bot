@@ -2,8 +2,8 @@ const { SlashCommandBuilder } = require('discord.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('compare_achievements')
-		.setDescription('Shows achievements locked for you that are unlocked for other players')
+		.setName('list_compare_achievements')
+		.setDescription('Lists achievements locked for you that are unlocked for other players')
 		.addStringOption(option =>
 			option.setName('game_name')
 				.setDescription('name of the game as you specified it (do /list_games)')
@@ -55,6 +55,6 @@ module.exports = {
 		}
 		await Promise.all([gameObject.updateGlobalPercentage(), gameObject.getAchievementsIcon()])
 		gameObject.displayProgressionBar(interaction)
-		gameObject.compareAchievements(userAuthor, users_vs, interaction)
+		gameObject.listCompareAchievements(userAuthor, users_vs, interaction)
 	}
 };

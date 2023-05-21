@@ -101,17 +101,15 @@ class Game {
                 console.error("getAchievementIcon error : ", err);
             });
     }
-    compareAchievements(userAuthor, users_vs, interaction) {
+
+    listCompareAchievements(userAuthor, users_vs, interaction) {
         var validAchievements = Object.entries(this.achievements).map(([a_id, a]) => {
-            // console.log(a_id, a)
             if (a.playersUnlockTime[userAuthor.steam_id] === 0) {
                 const playersWhoUnlocked = Object.entries(a.playersUnlockTime).map(([u, unlocked_time]) => {
-                    // console.log(u.steam_id, unlocked_time)
                     if (unlocked_time != 0 && users_vs.map(_u => _u.steam_id).includes(u)) {
                         return users_vs.find(_u => _u.steam_id === u)
                     }
                 }).filter(notUndefined => notUndefined !== undefined);
-                // console.log(`playersWhoUnlocked : ${playersWhoUnlocked}`)
                 if (playersWhoUnlocked.length > 0) {
                     return { object: a, playersWhoUnlocked: playersWhoUnlocked }
                 }
@@ -122,8 +120,43 @@ class Game {
         if (users_vs.length === 1) {
             vs1 = users_vs[0]
         }
+        const canvas_title = `Locked achievements for ${userAuthor.nickname} vs. ${typeof vs1 === 'undefined' ? 'all' : vs1.nickname}`
+        const canvas_title2 = `locked`
+        this.displayAchievementsList(validAchievements, interaction, [canvas_title, canvas_title2])
+    }
 
-        this.displayLockedAchievements(validAchievements, interaction, ['Locked achievements for', 'locked'], userAuthor, vs1)
+    listLockedAchievements(userAuthor, interaction, globalVariables) {
+        var validAchievements = Object.entries(this.achievements).map(([a_id, a]) => {
+            if (a.playersUnlockTime[userAuthor.steam_id] === 0) {
+                const playersWhoUnlocked = Object.entries(a.playersUnlockTime).map(([u, unlocked_time]) => {
+                    if (unlocked_time != 0) {
+                        return globalVariables.Users.find(_u => _u.steam_id === u)
+                    }
+                }).filter(notUndefined => notUndefined !== undefined);
+                return { object: a, playersWhoUnlocked: playersWhoUnlocked }
+            }
+
+        }).filter(notUndefined => notUndefined !== undefined);
+
+        const canvas_title = `Locked achievements for ${userAuthor.nickname}`
+        const canvas_title2 = `locked`
+        this.displayAchievementsList(validAchievements, interaction, [canvas_title, canvas_title2], userAuthor)
+    }
+
+    listAllAchievements(interaction, globalVariables) {
+        var validAchievements = Object.entries(this.achievements).map(([a_id, a]) => {
+            const playersWhoUnlocked = Object.entries(a.playersUnlockTime).map(([u, unlocked_time]) => {
+                if (unlocked_time != 0) {
+                    return globalVariables.Users.find(_u => _u.steam_id === u)
+                }
+            }).filter(notUndefined => notUndefined !== undefined);
+            return { object: a, playersWhoUnlocked: playersWhoUnlocked }
+
+        }).filter(notUndefined => notUndefined !== undefined);
+
+        const canvas_title = `All achievements`
+        const canvas_title2 = `all`
+        this.displayAchievementsList(validAchievements, interaction, [canvas_title, canvas_title2])
     }
 
     async displayProgressionBar(interaction) {
@@ -169,7 +202,7 @@ class Game {
         await interaction.reply({ files: [attachment] });
     }
 
-    async displayLockedAchievements(achievements_locked, interaction, filterAchievement, userAuthor, vs1) {
+    async displayAchievementsList(achievements_locked, interaction, canvas_title) {
         const MAX_PAGE = 5
         const background = await Canvas.loadImage('./assets/background.jpg')
         if (achievements_locked.length === 0) {
@@ -191,7 +224,8 @@ class Game {
             context.drawImage(background, 0, 0);
             context.font = '22px "Open Sans Regular"';
             context.fillStyle = '#ffffff';
-            context.fillText(`${filterAchievement[0]} ${userAuthor.nickname} vs. ${typeof vs1 === 'undefined' ? 'all' : vs1.nickname} ${startAnb} -${endAnb} out of ${achievements_locked.length} `, 20, 35);
+
+            context.fillText(`${canvas_title[0]} ${startAnb}-${endAnb} out of ${achievements_locked.length} `, 20, 35);
             var n = 0;
 
             achievements_fraction.forEach(function (a) {
@@ -224,7 +258,7 @@ class Game {
         const canFitOnOnePage = achievements_locked.length <= MAX_PAGE
         const slice_achievements = achievements_locked.slice(0, 0 + 5)
         const embedMessage = await interaction.channel.send({
-            embeds: [new EmbedBuilder().setTitle(`Showing ${filterAchievement[1]} achievements ${1} -${slice_achievements.length} out of ${achievements_locked.length} ${filterAchievement === 'locked' ? userAuthor.nickname : ''} `)],
+            embeds: [new EmbedBuilder().setTitle(`Showing ${canvas_title[1]} achievements ${1} -${slice_achievements.length} out of ${achievements_locked.length}`)],
             files: [get_embedded_img(slice_achievements, 1, slice_achievements.length)],
             components: canFitOnOnePage
                 ? []
@@ -244,7 +278,7 @@ class Game {
             const slice_achievements = achievements_locked.slice(currentIndex, currentIndex + 5)
 
             await interaction.update({
-                embeds: [new EmbedBuilder().setTitle(`Showing ${filterAchievement[1]} achievements ${currentIndex + 1} -${currentIndex + slice_achievements.length} out of ${achievements_locked.length} ${filterAchievement === 'locked' ? 'for ' + userAuthor.nickname : ''} `)],
+                embeds: [new EmbedBuilder().setTitle(`Showing ${canvas_title[1]} achievements ${currentIndex + 1}-${currentIndex + slice_achievements.length} out of ${achievements_locked.length}`)],
                 files: [get_embedded_img(slice_achievements, currentIndex + 1, currentIndex + slice_achievements.length)],
                 components: [
                     new ActionRowBuilder({
