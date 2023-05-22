@@ -240,6 +240,7 @@ class Game {
             var n = 0;
 
             achievements_fraction.forEach(function (a) {
+                console.log(a.object.icon)
                 context.drawImage(a.object.icon, 20, 53 + n * SPACE_BETWEEN, 60, 60);
 
                 context.font = '20px "Open Sans Regular"';
