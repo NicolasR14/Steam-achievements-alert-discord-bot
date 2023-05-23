@@ -24,7 +24,7 @@ module.exports = {
 			await interaction.reply("You are not in players list. Use */addplayer* command")
 			return
 		}
-		await Promise.all([gameObject.updateGlobalPercentage(), gameObject.getAchievementsIcon()])
+		await gameObject.updateGlobalPercentage()
 		gameObject.displayProgressionBar(interaction)
 		gameObject.listLockedAchievements(userAuthor, interaction, globalVariables)
 	}

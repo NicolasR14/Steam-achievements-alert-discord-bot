@@ -19,7 +19,7 @@ module.exports = {
 			await interaction.reply('Game not in the guild list!');
 			return
 		}
-		await Promise.all([gameObject.updateGlobalPercentage(), gameObject.getAchievementsIcon()])
+		await gameObject.updateGlobalPercentage()
 		gameObject.displayProgressionBar(interaction)
 		gameObject.listAllAchievements(interaction, globalVariables)
 	}

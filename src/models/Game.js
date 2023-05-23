@@ -41,6 +41,7 @@ class Game {
                     //check each achievement
                     if (typeof this.achievements[a.apiname] === 'undefined') {
                         this.achievements[a.apiname] = new Achievement(this, a.apiname, a.name, a.description)
+                        this.getAchievementsIcon()
                     }
 
                     this.achievements[a.apiname].playersUnlockTime[user.steam_id] = a.unlocktime
@@ -224,11 +225,7 @@ class Game {
             return parseFloat(b.object.globalPercentage) - parseFloat(a.object.globalPercentage)
         })
 
-
-        await Promise.all(achievements_locked.map(async (achievement) => {
-            achievement.object.icon = await Canvas.loadImage(achievement.object.icon)
-        }))
-        function get_embedded_img(achievements_fraction, startAnb, endAnb) {
+        async function get_embedded_img(achievements_fraction, startAnb, endAnb) {
             const SPACE_BETWEEN = 90
             const canvas = Canvas.createCanvas(700, 135 + (achievements_fraction.length - 1) * SPACE_BETWEEN);
             const context = canvas.getContext('2d');
@@ -237,11 +234,11 @@ class Game {
             context.fillStyle = '#ffffff';
 
             context.fillText(`${canvas_title[0]} ${startAnb}-${endAnb} out of ${achievements_locked.length} `, 20, 35);
-            var n = 0;
+            // var n = 0;
 
-            achievements_fraction.forEach(function (a) {
-                console.log(a.object.icon)
-                context.drawImage(a.object.icon, 20, 53 + n * SPACE_BETWEEN, 60, 60);
+            await Promise.all(achievements_fraction.map(async (a, n) => {
+                const icon = await Canvas.loadImage(a.object.icon)
+                context.drawImage(icon, 20, 53 + n * SPACE_BETWEEN, 60, 60);
 
                 context.font = '20px "Open Sans Regular"';
                 context.fillStyle = '#67d4f4';
@@ -261,17 +258,16 @@ class Game {
 
                 printAtWordWrap(context, a.object.achievementDescription, 100, 96 + n * SPACE_BETWEEN, 20, 580)
                 // context.fillText(, 100, 96+n*70);
-
-                n += 1;
-            })
+            }))
             return new AttachmentBuilder(canvas.toBuffer(), 'img_part2.png')
         }
 
         const canFitOnOnePage = achievements_locked.length <= MAX_PAGE
         const slice_achievements = achievements_locked.slice(0, 0 + 5)
+        const img_first = await get_embedded_img(slice_achievements, 1, slice_achievements.length)
         const embedMessage = await interaction.channel.send({
             embeds: [new EmbedBuilder().setTitle(`Showing ${canvas_title[1]} achievements ${1} -${slice_achievements.length} out of ${achievements_locked.length}`)],
-            files: [get_embedded_img(slice_achievements, 1, slice_achievements.length)],
+            files: [img_first],
             components: canFitOnOnePage
                 ? []
                 : [new ActionRowBuilder({ components: [forwardButton] })]
@@ -288,10 +284,11 @@ class Game {
             interaction.customId === backButton.data.custom_id ? (currentIndex = currentIndex - MAX_PAGE) : (currentIndex = currentIndex + MAX_PAGE)
             // Respond to interaction by updating message with new embed
             const slice_achievements = achievements_locked.slice(currentIndex, currentIndex + 5)
+            const img = await get_embedded_img(slice_achievements, currentIndex + 1, currentIndex + slice_achievements.length)
 
             await interaction.update({
                 embeds: [new EmbedBuilder().setTitle(`Showing ${canvas_title[1]} achievements ${currentIndex + 1}-${currentIndex + slice_achievements.length} out of ${achievements_locked.length}`)],
-                files: [get_embedded_img(slice_achievements, currentIndex + 1, currentIndex + slice_achievements.length)],
+                files: [img],
                 components: [
                     new ActionRowBuilder({
                         components: [

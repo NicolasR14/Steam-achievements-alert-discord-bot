@@ -41,13 +41,16 @@ class User {
         } else throw Error;
       })
       .then((value) => {
-        this.recentlyPlayedGames = value.response.games.map(game => {
-          var matchGame = Games.find(g => g.id === String(game.appid))
-          if (matchGame) {
-            this.timePlayedByGame[game.appid] = parseInt(parseInt(game.playtime_forever) / 60)
-            return matchGame
-          }
-        }).filter(notUndefined => notUndefined !== undefined);
+        this.recentlyPlayedGames = []
+        if (value.response.total_count != 0) {
+          this.recentlyPlayedGames = value.response.games.map(game => {
+            var matchGame = Games.find(g => g.id === String(game.appid))
+            if (matchGame) {
+              this.timePlayedByGame[game.appid] = parseInt(parseInt(game.playtime_forever) / 60)
+              return matchGame
+            }
+          }).filter(notUndefined => notUndefined !== undefined);
+        }
         console.log(`Recently played games for ${this.nickname} : ${this.recentlyPlayedGames.map(g => g.id)}`)
         return this.recentlyPlayedGames
       })

@@ -54,7 +54,7 @@ module.exports = {
 			})
 
 		}
-		await Promise.all([gameObject.updateGlobalPercentage(), gameObject.getAchievementsIcon()])
+		await gameObject.updateGlobalPercentage()
 		gameObject.displayProgressionBar(interaction)
 		gameObject.listCompareAchievements(userAuthor, users_vs, interaction)
 	}
