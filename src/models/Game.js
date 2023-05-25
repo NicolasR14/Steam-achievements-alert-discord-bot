@@ -126,9 +126,9 @@ class Game {
         this.displayAchievementsList(validAchievements, interaction, [canvas_title, canvas_title2])
     }
 
-    listLockedAchievements(userAuthor, interaction, globalVariables) {
+    listLockedAchievements(userAuthor, interaction, globalVariables, other_users) {
         var validAchievements = Object.entries(this.achievements).map(([a_id, a]) => {
-            if (a.playersUnlockTime[userAuthor.steam_id] === 0) {
+            if (a.playersUnlockTime[userAuthor.steam_id] === 0 || other_users.filter(u => a.playersUnlockTime[u.steam_id] === 0).length > 0) {
                 const playersWhoUnlocked = Object.entries(a.playersUnlockTime).map(([u, unlocked_time]) => {
                     const userObject = globalVariables.Users.find(_u => _u.steam_id === u)
                     if (unlocked_time != 0 && userObject.guilds.includes(interaction.guildId)) {
@@ -140,7 +140,7 @@ class Game {
 
         }).filter(notUndefined => notUndefined !== undefined);
 
-        const canvas_title = `Locked achievements for ${userAuthor.nickname}`
+        const canvas_title = `Locked for ${userAuthor.nickname} ${other_users.length > 0 ? `or ${other_users.map(user => user.nickname)}` : ``}`
         const canvas_title2 = `locked`
         this.displayAchievementsList(validAchievements, interaction, [canvas_title, canvas_title2], userAuthor)
     }
