@@ -14,10 +14,7 @@ const configDB = {
     options: {
         encrypt: true
     },
-    
-    extra: {
-        trustServerCertificate: true,
-    }
+    trustServerCertificate: true
 }
 
 async function getGamesAndUsers() {
