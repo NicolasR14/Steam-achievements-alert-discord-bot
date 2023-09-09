@@ -13,6 +13,10 @@ const configDB = {
     },
     options: {
         encrypt: true
+    },
+    
+    extra: {
+        trustServerCertificate: true,
     }
 }
 
