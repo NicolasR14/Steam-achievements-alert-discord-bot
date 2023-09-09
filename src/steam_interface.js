@@ -41,7 +41,7 @@ async function getAvatars(users) {
       })
     })
     .catch(function (err) {
-      console.error(err);
+      console.error(err);  
     });
 }
 

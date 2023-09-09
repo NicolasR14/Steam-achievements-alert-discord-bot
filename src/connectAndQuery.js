@@ -6,8 +6,7 @@ const { Game } = require('../src/models/Game')
 const configDB = {
     user: config.userDB,
     password: config.passwordDB,
-    server: config.serverDB,
-    port: config.portDB,
+    server: config.serverDB, //port?
     database: config.database,
     authentication: {
         type: 'default'
