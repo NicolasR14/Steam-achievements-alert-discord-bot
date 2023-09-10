@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
-const { addUserDB } = require('../../connectAndQuery')
+const { addUserDB } = require('../../connectAndQueryJSON')
 const { User } = require('../../models/User.js')
 const { getAvatars, isPublicProfile } = require('../../steam_interface')
 

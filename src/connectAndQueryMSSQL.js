@@ -1,7 +1,7 @@
 const sql = require('mssql');
 const config = require('../config.json')
-const { User } = require('../src/models/User')
-const { Game } = require('../src/models/Game')
+const { User } = require('./models/User')
+const { Game } = require('./models/Game')
 
 const configDB = {
     user: config.userDB,

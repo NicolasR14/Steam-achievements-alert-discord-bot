@@ -3,7 +3,8 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
 const { discord_token } = require('./config.json');
-const { getGamesAndUsers } = require('./src/connectAndQuery.js')
+// const { getGamesAndUsers } = require('./src/connectAndQueryMSSQL.js')
+const { getGamesAndUsers } = require('./src/connectAndQueryJSON')
 const { getAvatars, listenForNewAchievements } = require('./src/steam_interface.js')
 const { Guild } = require('./src/models/Guild')
 

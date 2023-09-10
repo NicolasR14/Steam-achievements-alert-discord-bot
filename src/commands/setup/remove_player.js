@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
-const { removePlayerDB } = require('../../connectAndQuery');
+const { removePlayerDB } = require('../../connectAndQueryJSON')
 
 module.exports = {
 	data: new SlashCommandBuilder()

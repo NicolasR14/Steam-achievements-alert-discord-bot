@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
-const { addGameDB } = require('../../connectAndQuery')
+const { addGameDB } = require('../../connectAndQueryJSON')
 const { Game } = require('../../models/Game.js')
 
 
