@@ -5,14 +5,15 @@ const { AttachmentBuilder, EmbedBuilder, ActionRowBuilder } = require('discord.j
 const { backButton, forwardButton } = require('../../assets/buttons')
 const printAtWordWrap = require('../../assets/utils')
 const Canvas = require('canvas');
-
+const { ChartJSNodeCanvas } = require('chartjs-node-canvas');
+require('chartjs-adapter-moment')
 class Game {
     constructor(name, id, guilds) {
         this.id = id;
         this.name = name;
         this.realName = ''
         this.guilds = guilds;
-        this.achievements = {} //Dictionnaire clé id achievements et valeur l'objets de l'achievement
+        this.achievements = {} //Dictionnaire clé id achievements et valeur l'objet de l'achievement
         this.nbUnlocked = {} //Dictionnaire user steam id avec l'objet user
         this.nbTotal
     }
@@ -301,6 +302,165 @@ class Game {
                 ]
             })
         })
+    }
+
+    async displayAchievementsHistory(interaction) {
+        let timestamp_history = {} //Dict with list of timestamps of achievements unlock time for each player(key)
+        let all_timestamps = []
+        let nbAchievementsList = {}
+        Object.keys(this.nbUnlocked).forEach(userSteamID => {
+            timestamp_history[userSteamID] = []
+            nbAchievementsList[userSteamID] = []
+        });
+        for (const achievement of Object.values(this.achievements)) {
+            for (const [userSteamID, userUnlockTime] of Object.entries(achievement.playersUnlockTime)) {
+                if (userUnlockTime != 0) {
+                    timestamp_history[userSteamID].push(userUnlockTime)
+                    if (!all_timestamps.includes(userUnlockTime)) {
+                        all_timestamps.push(userUnlockTime)
+                    }
+                }
+
+            }
+        }
+
+        all_timestamps.sort(function (a, b) {
+            return a - b;
+        });
+
+        let all_timestamps_temp = []
+        all_timestamps.forEach(timestamp => {
+            all_timestamps_temp.push(timestamp - 1)
+            all_timestamps_temp.push(timestamp)
+            for (const [userSteamID, timestampsUser] of Object.entries(timestamp_history)) {
+                const last_nb = nbAchievementsList[userSteamID].length == 0 ? 0 : nbAchievementsList[userSteamID].at(-1)
+                nbAchievementsList[userSteamID].push(last_nb)
+                const new_nb = last_nb + timestampsUser.filter((x) => x == timestamp).length
+                nbAchievementsList[userSteamID].push(new_nb)
+            }
+        });
+
+        all_timestamps = all_timestamps_temp.map((timestamp) => new Date(timestamp * 1000))
+
+
+        for (const [userSteamID, timestampsUser] of Object.entries(timestamp_history)) {
+            const last_nb = nbAchievementsList[userSteamID].length == 0 ? 0 : nbAchievementsList[userSteamID].at(-1)
+            nbAchievementsList[userSteamID].push(last_nb)
+        }
+
+        all_timestamps.push(Date.now())
+
+        let datasets = []
+
+        const color_pallet = ["#3074f6", "#FE9000", "#018e42", "#F7D002", "#D36060", "#F00699"]
+        let i = 0
+
+        for (const [userSteamID, userObject] of Object.entries(this.nbUnlocked)) {
+            datasets.push({
+                data: nbAchievementsList[userSteamID],
+                borderColor: color_pallet[i],
+                label: userObject.user.nickname
+            })
+            i = i + 1
+        }
+
+        const width = 700; //px
+        const height = 500; //px
+        const backgroundColour = '#11181f';
+        const chartJSNodeCanvas = new ChartJSNodeCanvas({ width, height, backgroundColour });
+
+        const gridcolor = '#797a7b'
+
+        const configuration = {
+            type: "line",
+            data: {
+                labels: all_timestamps,
+                datasets: datasets
+            },
+            options: {
+                layout: {
+                    padding: {
+                        right: 20
+                    }
+                },
+                scales: {
+                    x: {
+                        type: 'time',
+                        title: {
+                            display: true,
+                            text: 'Date',
+                            color: '#FFFFFF',
+                            font: {
+                                size: 16
+                            }
+                        },
+                        ticks: {
+                            color: '#afb0b7'
+                        },
+                        grid: {
+                            display: true,
+                            drawOnChartArea: true,
+                            drawTicks: true,
+                            color: "#303131"
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Number of achievements unlocked',
+                            color: '#FFFFFF',
+                            font: {
+                                size: 16
+                            }
+                        },
+                        ticks: {
+                            color: '#afb0b7'
+                        },
+                        grid: {
+                            display: true,
+                            drawOnChartArea: true,
+                            drawTicks: true,
+                            color: "#303131"
+                        }
+                    }
+                },
+                elements: {
+                    point: {
+                        radius: 0
+                    }
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: "History of the number of achievements unlocked for each player",
+                        color: "#FFFFFF",
+                        font: {
+                            size: 20
+                        }
+                    },
+                    legend: {
+                        labels: {
+                            color: "#FFFFFF",
+                            font: {
+                                size: 16
+                            },
+                            usePointStyle: true,
+                            pointStyle: 'line',
+
+                            padding: 20
+                        }
+                    }
+                }
+
+            }
+        };
+        const image = await chartJSNodeCanvas.renderToBuffer(configuration);
+        // const dataUrl = await chartJSNodeCanvas.renderToDataURL(configuration);
+        // const stream = chartJSNodeCanvas.renderToStream(configuration);
+
+        const attachment = new AttachmentBuilder(image)
+        await interaction.reply({ files: [attachment] });
+
     }
 }
 module.exports = { Game }
