@@ -443,7 +443,7 @@ class Game {
                 plugins: {
                     title: {
                         display: true,
-                        text: "History of the number of achievements unlocked for each player",
+                        text: `History on ${this.realName}`,
                         color: "#FFFFFF",
                         font: {
                             size: 20
