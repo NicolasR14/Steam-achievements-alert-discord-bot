@@ -307,14 +307,22 @@ class Game {
     async displayAchievementsHistory(interaction) {
         let timestamp_history = {} //Dict with list of timestamps of achievements unlock time for each player(key)
         let all_timestamps = []
+        const guild_users = []
+
         let nbAchievementsList = {}
         Object.keys(this.nbUnlocked).forEach(userSteamID => {
-            timestamp_history[userSteamID] = []
-            nbAchievementsList[userSteamID] = []
+            if (this.nbUnlocked[userSteamID].user.guilds.includes(interaction.guildId)) {
+                timestamp_history[userSteamID] = []
+                nbAchievementsList[userSteamID] = []
+                guild_users.push(userSteamID)
+            }
+
+
         });
+
         for (const achievement of Object.values(this.achievements)) {
             for (const [userSteamID, userUnlockTime] of Object.entries(achievement.playersUnlockTime)) {
-                if (userUnlockTime != 0) {
+                if (userUnlockTime != 0 && guild_users.includes(userSteamID)) {
                     timestamp_history[userSteamID].push(userUnlockTime)
                     if (!all_timestamps.includes(userUnlockTime)) {
                         all_timestamps.push(userUnlockTime)
@@ -356,12 +364,15 @@ class Game {
         let i = 0
 
         for (const [userSteamID, userObject] of Object.entries(this.nbUnlocked)) {
-            datasets.push({
-                data: nbAchievementsList[userSteamID],
-                borderColor: color_pallet[i],
-                label: userObject.user.nickname
-            })
-            i = i + 1
+            if (guild_users.includes(userSteamID)) {
+                datasets.push({
+                    data: nbAchievementsList[userSteamID],
+                    borderColor: color_pallet[i],
+                    label: userObject.user.nickname
+                })
+                i = i + 1
+            }
+
         }
 
         const width = 700; //px
