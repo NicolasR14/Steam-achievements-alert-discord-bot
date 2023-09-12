@@ -15,7 +15,6 @@
     "chartjs-adapter-moment": "^1.0.1",
     "chartjs-node-canvas": "^4.1.6",
     "csv-append": "^1.0.0",
-    "date-fns": "^2.30.0",
     "discord.js": "^14.11.0",
     "mssql": "^9.1.1",
     "node-fetch": "^2.6.11"

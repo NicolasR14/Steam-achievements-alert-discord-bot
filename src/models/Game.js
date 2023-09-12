@@ -5,8 +5,8 @@ const { AttachmentBuilder, EmbedBuilder, ActionRowBuilder } = require('discord.j
 const { backButton, forwardButton } = require('../../assets/buttons')
 const printAtWordWrap = require('../../assets/utils')
 const Canvas = require('canvas');
-const { ChartJSNodeCanvas } = require('chartjs-node-canvas');
 require('chartjs-adapter-moment')
+const { ChartJSNodeCanvas } = require('chartjs-node-canvas');
 class Game {
     constructor(name, id, guilds) {
         this.id = id;
@@ -305,6 +305,8 @@ class Game {
     }
 
     async displayAchievementsHistory(interaction) {
+        delete require.cache[require.resolve('chartjs-adapter-moment')]
+        require('chartjs-adapter-moment')
         let timestamp_history = {} //Dict with list of timestamps of achievements unlock time for each player(key)
         let all_timestamps = []
         const guild_users = []
@@ -378,9 +380,7 @@ class Game {
         const width = 700; //px
         const height = 500; //px
         const backgroundColour = '#11181f';
-        const chartJSNodeCanvas = new ChartJSNodeCanvas({ width, height, backgroundColour });
-
-        const gridcolor = '#797a7b'
+        const chart = new ChartJSNodeCanvas({ width, height, backgroundColour });
 
         const configuration = {
             type: "line",
@@ -465,9 +465,9 @@ class Game {
 
             }
         };
-        const image = await chartJSNodeCanvas.renderToBuffer(configuration);
-        // const dataUrl = await chartJSNodeCanvas.renderToDataURL(configuration);
-        // const stream = chartJSNodeCanvas.renderToStream(configuration);
+        const image = await chart.renderToBuffer(configuration);
+        const dataUrl = await chart.renderToDataURL(configuration);
+        const stream = chart.renderToStream(configuration);
 
         const attachment = new AttachmentBuilder(image)
         await interaction.reply({ files: [attachment] });
