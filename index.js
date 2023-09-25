@@ -20,7 +20,8 @@ var globalVariables = {
 	'Guilds': [],
 	'Users': [],
 	'Games': [],
-	't_0': parseInt(Date.now() / 1000)
+	// 't_0': parseInt(Date.now() / 1000),
+	't_0': 1695499177519
 }
 
 
