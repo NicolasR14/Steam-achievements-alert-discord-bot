@@ -2,11 +2,12 @@ const { API_Steam_key } = require('../../config.json')
 const fetch = require('node-fetch');
 
 class User {
-  constructor(steam_id, discord_id, nickname, guilds) {
+  constructor(steam_id, discord_id, nickname, guilds, color) {
     this.steam_id = steam_id;
     this.discord_id = discord_id;
     this.nickname = nickname;
     this.guilds = guilds;
+    this.color = color;
     this.avatar;
     this.recentlyPlayedGames = [];
     this.newAchievements = [] //pour l'affichage

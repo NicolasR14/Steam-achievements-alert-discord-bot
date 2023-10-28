@@ -56,10 +56,12 @@ module.exports = {
 			}
 		}
 
+		const color = '#' + Math.floor(Math.random() * 16777215).toString(16);
+		console.log(color)
 		if (is_new_player) {
-			globalVariables.Users.push(new User(steam_id, discord_id, nickname, [interaction.guildId]))
+			globalVariables.Users.push(new User(steam_id, discord_id, nickname, [interaction.guildId], color))
 		}
-		addUserDB(discord_id, steam_id, nickname, interaction, is_new_player)
+		addUserDB(discord_id, steam_id, nickname, interaction, color)
 			.then(() => {
 				var userObject = globalVariables.Users.find(user => user.discord_id === discord_id)
 				getAvatars([userObject])

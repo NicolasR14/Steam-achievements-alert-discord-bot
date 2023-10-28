@@ -11,7 +11,7 @@ async function getGamesAndUsers() {
     const data = JSON.parse(jsonData);
     try {
         Object.entries(data.users).forEach(([DiscordID, user]) => {
-            users.push(new User(user.SteamID, DiscordID, user.DiscordNickname, user.Guilds))
+            users.push(new User(user.SteamID, DiscordID, user.DiscordNickname, user.Guilds, user.Color))
         })
         Object.entries(data.games).forEach(([AppID, game]) => {
             games.push(new Game(game.Name, AppID, game.Guilds))
@@ -45,7 +45,7 @@ async function addGameDB(interaction, game_id, game_name, find) {
     }
 }
 
-async function addUserDB(DiscordID, SteamID, DiscordNickname, interaction, is_new_player) {
+async function addUserDB(DiscordID, SteamID, DiscordNickname, interaction, color) {
 
     try {
         const jsonData = fs.readFileSync(data_path);
@@ -58,7 +58,8 @@ async function addUserDB(DiscordID, SteamID, DiscordNickname, interaction, is_ne
         data.users[DiscordID] = {
             "SteamID": SteamID,
             "DiscordNickname": DiscordNickname,
-            "Guilds": guilds
+            "Guilds": guilds,
+            "Color": color
         }
         fs.writeFileSync(data_path, JSON.stringify(data));
         await interaction.reply('User added');

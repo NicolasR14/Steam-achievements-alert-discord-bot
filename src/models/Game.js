@@ -363,17 +363,13 @@ class Game {
 
         let datasets = []
 
-        const color_pallet = ["#3074f6", "#FE9000", "#018e42", "#F7D002", "#D36060", "#F00699"]
-        let i = 0
-
         for (const [userSteamID, userObject] of Object.entries(this.nbUnlocked)) {
             if (guild_users.includes(userSteamID)) {
                 datasets.push({
                     data: nbAchievementsList[userSteamID],
-                    borderColor: color_pallet[i],
+                    borderColor: userObject.user.color,
                     label: userObject.user.nickname
                 })
-                i = i + 1
             }
 
         }
