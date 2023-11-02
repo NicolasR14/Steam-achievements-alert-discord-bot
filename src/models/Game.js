@@ -278,7 +278,7 @@ class Game {
         if (canFitOnOnePage) return
 
         // Collect button interactions (when a user clicks a button)
-        const collector = embedMessage.createMessageComponentCollector()
+        const collector = embedMessage.createMessageComponentCollector({ time: 172800000 })
 
         let currentIndex = 0
         collector.on('collect', async interaction => {
