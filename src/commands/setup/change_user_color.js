@@ -25,11 +25,21 @@ module.exports = {
         }
         var userObject = globalVariables.Users.find(user => user.discord_id === discord_id)
 
-        if (userObject) {
-            userObject.color = color
-            await interaction.reply('Player color updated')
-            return
+        try {
+            if (userObject) {
+                changeColorDB(discord_id, color)
+                userObject.color = color
+                await interaction.reply('Player color updated')
+                return
+            }
+            else {
+                await interaction.reply('Player not found')
+                return
+            }
         }
-        await interaction.reply('Error occurred')
+        catch (error) {
+            console.error(error.message);
+            await interaction.reply('Error');
+        }
     }
 }

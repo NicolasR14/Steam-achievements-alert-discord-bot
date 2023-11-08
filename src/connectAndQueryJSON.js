@@ -107,4 +107,16 @@ async function removePlayerDB(userDiscordId, guildId, nbGuildsUser, interaction)
     }
 }
 
-module.exports = { getGamesAndUsers, addGameDB, addUserDB, removeGameDB, removePlayerDB };
+async function changeColorDB(userDiscordId, color) {
+    try {
+        const jsonData = fs.readFileSync(data_path);
+        const data = JSON.parse(jsonData);
+        data.users[userDiscordId].Color = color
+        fs.writeFileSync(data_path, JSON.stringify(data));
+    } catch (error) {
+        console.error(error.message);
+    }
+
+}
+
+module.exports = { getGamesAndUsers, addGameDB, addUserDB, removeGameDB, removePlayerDB, changeColorDB };
