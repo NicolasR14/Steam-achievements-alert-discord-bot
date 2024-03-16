@@ -41,7 +41,7 @@ async function getAvatars(users) {
       })
     })
     .catch(function (err) {
-      console.error(err);  
+      console.error(err);
     });
 }
 
@@ -91,5 +91,19 @@ function listenForNewAchievements(globalVariables) {
 
   }, 60000)
 }
+async function isGameIdValid(game_id) {
+  return await fetch(`http://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2/?appid=${game_id}&key=${API_Steam_key}`)
+    .then(res => {
+      console.log(`${game_id} : ID valid ? ${res.ok}`);
+      if (res.ok) {
+        return res.json().then((value) => {
+          if (Object.keys(value.game).length == 0) {
+            return 0
+          }
+          return 1
+        })
+      } else return -1
+    })
+}
 
-module.exports = { getAvatars, listenForNewAchievements, isPublicProfile };
+module.exports = { getAvatars, listenForNewAchievements, isPublicProfile, isGameIdValid };
