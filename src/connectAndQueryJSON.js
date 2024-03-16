@@ -4,7 +4,7 @@ const data_path = 'src/data.json'
 const { User } = require('./models/User')
 const { Game } = require('./models/Game')
 
-async function getGamesAndUsers() {
+async function getInfosDB(guilds, client) {
     var users = [];
     var games = [];
     const jsonData = fs.readFileSync(data_path);
@@ -15,6 +15,12 @@ async function getGamesAndUsers() {
         })
         Object.entries(data.games).forEach(([AppID, game]) => {
             games.push(new Game(game.Name, AppID, game.Guilds))
+        })
+        guilds.forEach((guild) => {
+            if (Object.keys(data.guilds).includes(guild.id)) {
+                guild.channel_id = data.guilds[guild.id].channelId
+                guild.channel = client.guilds.cache.get(guild.id).channels.cache.find(c => c.id === guild.channel_id)
+            }
         })
     } catch {
         console.error("Error while reading data.json")
@@ -119,4 +125,23 @@ async function changeColorDB(userDiscordId, color) {
 
 }
 
-module.exports = { getGamesAndUsers, addGameDB, addUserDB, removeGameDB, removePlayerDB, changeColorDB };
+async function changeChannelIdGuildDB(guildId, channelId) {
+    try {
+        const jsonData = fs.readFileSync(data_path);
+        const data = JSON.parse(jsonData);
+        if (Object.keys(data.guilds).includes(guildId)) {
+            data.guilds[guildId].channelId = channelId
+        }
+        else {
+            data.guilds[guildId] = {
+                "channelId": channelId
+            }
+        }
+        fs.writeFileSync(data_path, JSON.stringify(data));
+    }
+    catch (error) {
+        console.error(error.message);
+    }
+}
+
+module.exports = { addGameDB, addUserDB, removeGameDB, removePlayerDB, changeColorDB, changeChannelIdGuildDB, getInfosDB };

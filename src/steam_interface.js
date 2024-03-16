@@ -58,7 +58,7 @@ function listenForNewAchievements(globalVariables) {
     }))
 
     const new_achievements = globalVariables.Users.map(user => user.newAchievements.map(a => [user, a])).flat(1);
-    console.log(new_achievements.length)
+    console.log(`Nb new achievements to display : ${new_achievements.length}`)
     if (new_achievements.length > 0) {
       await Promise.all(globalVariables.Games.map(async game => {
         await game.updateGlobalPercentage()
