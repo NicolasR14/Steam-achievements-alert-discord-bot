@@ -18,8 +18,8 @@ module.exports = {
 	async execute(interaction, globalVariables) {
 		const game_id = interaction.options.getString('game_id')
 		const game_name = interaction.options.getString('name')
-		const game_id_valid = await isGameIdValid(game_id)
 		await interaction.deferReply()
+		const game_id_valid = await isGameIdValid(game_id)
 		if (game_id_valid == 1) {
 			var find = false;
 			for (var game of globalVariables.Games) {

@@ -38,7 +38,6 @@ client.once(Events.ClientReady, async c => {
 		await Promise.all(globalVariables.Games.map(async game => {
 			{
 				await game.updateAchievements(user, globalVariables.t_0, start = true)
-				game.getAchievementsIcon()
 			}
 		}))
 	}))

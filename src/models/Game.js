@@ -67,6 +67,7 @@ class Game {
     }
 
     updateGlobalPercentage() {
+        const id = this.id
         return fetch(`http://api.steampowered.com/ISteamUserStats/GetGlobalAchievementPercentagesForApp/v0002/?gameid=${this.id}&format=json`) //get total players unlocked rate
             .then(res => {
                 if (res.ok) {
@@ -75,15 +76,20 @@ class Game {
             })
             .then(value => {
                 for (const a of value.achievementpercentages.achievements) {
-                    this.achievements[a.name].globalPercentage = parseFloat(a.percent).toFixed(1);
+                    if (this.achievements[a.name]) {
+                        this.achievements[a.name].globalPercentage = parseFloat(a.percent).toFixed(1);
+                    }
                 }
             })
             .catch(function (err) {
-                console.error("updateGlobalPercentage error : ", err);
+                console.log(`http://api.steampowered.com/ISteamUserStats/GetGlobalAchievementPercentagesForApp/v0002/?gameid=${id}&format=json`)
+                console.error(`updateGlobalPercentage error for ${id} : ${err}`);
             });
     }
 
     getAchievementsIcon() {
+        const id = this.id
+        const name = this.name
         return fetch(`http://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2/?appid=${this.id}&key=${API_Steam_key}`)
             //get infos on game achievements
             .then(res => {
@@ -100,7 +106,8 @@ class Game {
                 }
             })
             .catch(function (err) {
-                console.error("getAchievementIcon error : ", err);
+                console.log(`http://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2/?appid=${id}&key=${API_Steam_key}`)
+                console.error(`getAchievementIcon error for ${id}, ${name} : ${err} `);
             });
     }
 
@@ -188,32 +195,39 @@ class Game {
 
         users_nb_unlocked_not_null = sorted
 
-        var n = 0;
+        const name_display = this.realName === '' ? this.name : this.realName
 
-        context.font = '25px "Open Sans Regular"';
-        context.fillStyle = '#ffffff';
-        context.fillText("Progress on " + this.realName, 25, 35);
-
-        const tps_max = Math.max(...users_nb_unlocked_not_null.map(u => { return u[0].timePlayedByGame[this.id] }))
-
-        const barLength = 480
-
-        users_nb_unlocked_not_null.forEach((v) => {
-            context.drawImage(v[0].avatar, 25, 48 + n * 70, 50, 50);
-            context.font = '15px "Open Sans Regular"';
-            context.fillStyle = '#bfbfbf';
-            context.fillText(`${v[1]}/${this.nbTotal} (${parseInt(100 * v[1] / this.nbTotal)}%)`, 100 + barLength + 10, 71 + n * 70);
-            context.drawImage(black_bar, 100, 58 + n * 70, barLength, 15);
-            context.drawImage(blue_bar, 100, 58 + n * 70, barLength * v[1] / this.nbTotal, 15);
-            context.fillText(`${v[0].timePlayedByGame[this.id]} h`, 100 + barLength + 10, 91 + n * 70);
-            context.drawImage(black_bar, 100, 78 + n * 70, barLength, 15);
-            context.drawImage(grey_bar, 100, 78 + n * 70, barLength * v[0].timePlayedByGame[this.id] / tps_max, 15)
-            n += 1;
-        })
-
-        attachment = new AttachmentBuilder(canvas.toBuffer())
         await interaction.deferReply();
-        await interaction.editReply({ files: [attachment] });
+        if (users_nb_unlocked_not_null.length > 0) {
+            var n = 0;
+
+            context.font = '25px "Open Sans Regular"';
+            context.fillStyle = '#ffffff';
+            context.fillText("Progress on " + name_display, 25, 35);
+
+            const tps_max = Math.max(...users_nb_unlocked_not_null.map(u => { return u[0].timePlayedByGame[this.id] }))
+
+            const barLength = 480
+
+            users_nb_unlocked_not_null.forEach((v) => {
+                context.drawImage(v[0].avatar, 25, 48 + n * 70, 50, 50);
+                context.font = '15px "Open Sans Regular"';
+                context.fillStyle = '#bfbfbf';
+                context.fillText(`${v[1]}/${this.nbTotal} (${parseInt(100 * v[1] / this.nbTotal)}%)`, 100 + barLength + 10, 71 + n * 70);
+                context.drawImage(black_bar, 100, 58 + n * 70, barLength, 15);
+                context.drawImage(blue_bar, 100, 58 + n * 70, barLength * v[1] / this.nbTotal, 15);
+                context.fillText(`${v[0].timePlayedByGame[this.id]} h`, 100 + barLength + 10, 91 + n * 70);
+                context.drawImage(black_bar, 100, 78 + n * 70, barLength, 15);
+                context.drawImage(grey_bar, 100, 78 + n * 70, barLength * v[0].timePlayedByGame[this.id] / tps_max, 15)
+                n += 1;
+            })
+            attachment = new AttachmentBuilder(canvas.toBuffer())
+            await interaction.editReply({ files: [attachment] });
+            return
+        }
+        await interaction.editReply(`Nobody has achievement on ${name_display}`);
+
+
     }
 
     async displayAchievementsList(achievements_locked, interaction, canvas_title) {

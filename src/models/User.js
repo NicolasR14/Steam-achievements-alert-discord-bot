@@ -15,6 +15,8 @@ class User {
     this.timePlayedByGame = {}
   }
   async getPlaytime(Games) {
+    const steam_id = this.steam_id
+    const nickname = this.nickname
     await fetch(`http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=${API_Steam_key}&steamid=${this.steam_id}&format=json`)
       .then(function (res) {
         if (res.ok) {
@@ -30,7 +32,7 @@ class User {
         })
       })
       .catch(function (err) {
-        console.error("API error getPlaytime", err);
+        console.error(`API error getPlaytime for ${steam_id}, ${nickname} : ${err}`);
       });
   }
 

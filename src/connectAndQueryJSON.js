@@ -44,10 +44,10 @@ async function addGameDB(interaction, game_id, game_name, find) {
             "Guilds": guilds
         }
         fs.writeFileSync(data_path, JSON.stringify(data));
-        await interaction.reply('Game added');
+        await interaction.editReply('Game added');
     } catch (error) {
         console.error(error.message);
-        await interaction.reply('Error');
+        await interaction.editReply('Error');
     }
 }
 
