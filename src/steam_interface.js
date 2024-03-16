@@ -49,8 +49,8 @@ function listenForNewAchievements(globalVariables) {
   console.log('listening to new achievements...')
 
   setInterval(async function () {
-    console.log(`//////////////////////////////\nGames list : ${globalVariables.Games.map(game => game.name)}`)
-
+    console.log(`//////////////////////////////\nGames list : ${globalVariables.Games.map(game => { game.name, game.id })}`)
+    console.log(`Recently played games :`)
     await Promise.all(globalVariables.Users.map(async user => {
       await user.getRecentlyPlayedGames(globalVariables.Games)
       await Promise.all(user.recentlyPlayedGames.map(async game => {

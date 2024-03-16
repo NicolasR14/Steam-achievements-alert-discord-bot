@@ -38,7 +38,6 @@ class Game {
                 var nb_new_achievements = 0
                 this.nbTotal = value.playerstats.achievements.length
                 this.realName = value.playerstats.gameName
-                console.log(t_0)
                 for (const a of value.playerstats.achievements) {
                     //check each achievement
                     if (typeof this.achievements[a.apiname] === 'undefined') {
