@@ -213,7 +213,8 @@ class Game {
         })
 
         attachment = new AttachmentBuilder(canvas.toBuffer())
-        await interaction.reply({ files: [attachment] });
+        await interaction.deferReply();
+        await interaction.editReply({ files: [attachment] });
     }
 
     async displayAchievementsList(achievements_locked, interaction, canvas_title) {
@@ -467,7 +468,8 @@ class Game {
         const stream = chart.renderToStream(configuration);
 
         const attachment = new AttachmentBuilder(image)
-        await interaction.reply({ files: [attachment] });
+        await interaction.deferReply()
+        await interaction.editReply({ files: [attachment] })
 
     }
 }
