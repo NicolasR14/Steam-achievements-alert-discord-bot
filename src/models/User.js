@@ -52,7 +52,7 @@ class User {
             }
           }).filter(notUndefined => notUndefined !== undefined);
         }
-        console.log(`${this.nickname} : ${this.recentlyPlayedGames.map(g => g.name)}`)
+        console.log(`Recently played games [${this.nickname}] : ${this.recentlyPlayedGames.map(g => g.name)}`)
         return this.recentlyPlayedGames
       })
       .catch(function (err) {
