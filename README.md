@@ -1,6 +1,6 @@
 # Steam achievements alert discord bot
 This is a discord bot showing Steam achievements when unlocked and has other features to see the achievements not yet unlocked.
-It uses Azure SQL server, Discord API and Steam API and you'll need keys for both. Refer to https://discord.com/developers/docs/intro to know how to add a bot in a discord server.
+It uses Discord API and Steam API and you'll need keys for both. Refer to https://discord.com/developers/docs/intro to know how to add a bot in a discord server.
 It can work on multiple servers.
 
 ## Features
@@ -22,6 +22,16 @@ Shows achievements that are still locked for the user writing the command, the g
 
 There is a variant of this command to display achievements that are locked for the player writing the command AND that are unlocked for at least one of other players in the list. There is another variant to display all game achievements.
 
+### History number of achievements unlocked
+
+![image](https://github.com/NicolasR14/Steam-achievements-alert-discord-bot/assets/101961437/f7524b09-e38a-4f57-8b66-44ee366b7647)
+
+Displays number of achievements unlocked history for a specified game
+
 ## Config
-To use this bot you will need a SQL Azure Server, an API key for Steam DB, and an API Key for your bot on discord. An example config.json file is provided.
-Do /help to see the commands to setup the games and users lists.
+To use this bot you will need an API key for Steam DB, and an API Key for your bot on discord.
+
+- API Steam key : https://steamcommunity.com/dev/apikey
+- clientId & discord_token : https://discord.com/developers/applications
+- guildId : your discord server id
+- lang : https://partner.steamgames.com/doc/store/localization/languages (language list)
