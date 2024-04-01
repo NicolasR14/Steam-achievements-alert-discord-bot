@@ -28,6 +28,15 @@ There is a variant of this command to display achievements that are locked for t
 
 Displays number of achievements unlocked history for a specified game
 
+## Setup
+Before starting the bot, you should run deploy-comands.js
+
+Start the bot by running index.js
+
+Then you'll have to add players and games to be tracked (see add_game and add_player)
+
+To specify in which channel the bot should send notifications, run the command /display_new_achievements_here
+
 ## Config
 To use this bot you will need an API key for Steam DB, and an API Key for your bot on discord.
 
