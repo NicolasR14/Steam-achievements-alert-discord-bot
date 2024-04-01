@@ -24,7 +24,7 @@ There is a variant of this command to display achievements that are locked for t
 
 ### History number of achievements unlocked
 
-![image](https://github.com/NicolasR14/Steam-achievements-alert-discord-bot/assets/101961437/f7524b09-e38a-4f57-8b66-44ee366b7647)
+![image](https://github.com/NicolasR14/Steam-achievements-alert-discord-bot/assets/101961437/6d627e04-ad96-418e-902c-bd264bee01a1)
 
 Displays number of achievements unlocked history for a specified game
 
