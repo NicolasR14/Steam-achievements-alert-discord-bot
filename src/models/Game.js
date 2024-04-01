@@ -1,5 +1,5 @@
 const fetch = require('node-fetch');
-const { API_Steam_key } = require('../../config.json')
+const { API_Steam_key, lang } = require('../../config.json')
 const { Achievement } = require('./Achievement.js')
 const { AttachmentBuilder, EmbedBuilder, ActionRowBuilder } = require('discord.js');
 const { backButton, forwardButton } = require('../../assets/buttons')
@@ -18,7 +18,7 @@ class Game {
         this.nbTotal
     }
     async updateAchievements(user, t_0, start = false) {
-        return await fetch(`http://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v0001/?appid=${this.id}&key=${API_Steam_key}&steamid=${user.steam_id}&l=french`)
+        return await fetch(`http://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v0001/?appid=${this.id}&key=${API_Steam_key}&steamid=${user.steam_id}&l=${lang}`)
             .then(res => {
                 if (res.ok) {
                     return res.json();
