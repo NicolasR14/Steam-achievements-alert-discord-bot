@@ -93,10 +93,9 @@ function listenForNewAchievements(globalVariables) {
 async function isGameIdValid(game_id) {
   return await fetch(`http://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2/?appid=${game_id}&key=${API_Steam_key}`)
     .then(res => {
-      console.log(`${game_id} : ID valid ? ${res.ok}`);
       if (res.ok) {
         return res.json().then((value) => {
-          if (Object.keys(value.game).length == 0) {
+          if ((value.game.availableGameStats.achievements === undefined) || Object.keys(value.game.availableGameStats.achievements).length == 0) {
             return 0
           }
           return 1
