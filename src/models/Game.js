@@ -482,8 +482,6 @@ class Game {
             }
         };
         const image = await chart.renderToBuffer(configuration);
-        const dataUrl = await chart.renderToDataURL(configuration);
-        const stream = chart.renderToStream(configuration);
 
         const attachment = new AttachmentBuilder(image)
         await interaction.deferReply()

@@ -33,7 +33,7 @@ function getAvatars(users) {
     })
     .then(async function (value) {
       value.response.players.map(async (_user) => {
-        Canvas.loadImage(_user.avatar) //load image
+        Canvas.loadImage(_user.avatarfull) //load image
           .then(function (img) {
             users.find(user => user.steam_id === _user.steamid).avatar = img
             console.log(`Avatar updated for ${users.find(user => user.steam_id === _user.steamid).nickname}`)
