@@ -49,9 +49,9 @@ module.exports = {
 			return
 		}
 		if (game_id_valid == 0) {
-			await interaction.editReply("Pas de succès pour ce jeu, j'ajoute pas, déso")
+			await interaction.editReply("This game has no achievements. Not added.")
 			return
 		}
-		await interaction.editReply("C'EST PAS UN GAME ID VALIDE ABRUTI")
+		await interaction.editReply("Invalid game ID.")
 	}
 }
