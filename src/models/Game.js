@@ -202,6 +202,12 @@ class Game {
 
         const name_display = this.realName === '' ? this.name : this.realName
 
+        users_nb_unlocked_not_null.forEach((u) => {
+            if (u[0].timePlayedByGame[this.id] === undefined) {
+                u[0].timePlayedByGame[this.id] = 0
+            }
+        })
+
         await interaction.deferReply();
         if (users_nb_unlocked_not_null.length > 0) {
             var n = 0;
@@ -211,6 +217,8 @@ class Game {
             context.fillText("Progress on " + name_display, 25, 35);
 
             const tps_max = Math.max(...users_nb_unlocked_not_null.map(u => { return u[0].timePlayedByGame[this.id] }))
+
+            console.log(tps_max)
 
             const barLength = 480
 
