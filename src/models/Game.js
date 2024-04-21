@@ -23,7 +23,7 @@ class Game {
                 if (res.ok) {
                     return res.json();
                 } else {
-                    throw (`${this.name} : ${user.nickname} error`);
+                    throw (`${user.nickname} : error on ${this.name}`);
                 }
             })
             .then(async value => {
@@ -59,10 +59,15 @@ class Game {
                     }
                 }
                 this.nbUnlocked[user.steam_id] = { nbUnlocked: nb_unlocked, user: user }
-                console.log(`[${now}] Found ${nb_new_achievements} new achievements for ${user.nickname} on ${this.name}`)
+                if (!start) {
+                    console.log(`[${now}] Found ${nb_new_achievements} new achievements for ${user.nickname} on ${this.name}`)
+                }
             })
             .catch(function (err) {
-                console.log(err);
+                if (!start) {
+                    console.log(err);
+                }
+
             });
     }
 

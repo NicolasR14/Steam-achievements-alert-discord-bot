@@ -17,19 +17,26 @@ class User {
   async getPlaytime(Games) {
     const steam_id = this.steam_id
     const nickname = this.nickname
-    await fetch(`http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=${API_Steam_key}&steamid=${this.steam_id}&format=json`)
+    return await fetch(`http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=${API_Steam_key}&steamid=${this.steam_id}&format=json`)
       .then(function (res) {
         if (res.ok) {
           return res.json();
         } else throw Error;
       })
       .then((value) => {
-        value.response.games.forEach(game => {
-          var matchGame = Games.find(g => g.id === String(game.appid))
-          if (matchGame) {
-            this.timePlayedByGame[game.appid] = parseInt(parseInt(game.playtime_forever) / 60)
-          }
-        })
+        if (value.response.games !== undefined) {
+          value.response.games.forEach(game => {
+            var matchGame = Games.find(g => g.id === String(game.appid))
+            if (matchGame) {
+              this.timePlayedByGame[game.appid] = parseInt(parseInt(game.playtime_forever) / 60)
+            }
+          })
+          console.log(`Games playtime updated for ${nickname}`)
+        }
+        else {
+          throw Error("response empty")
+        }
+
       })
       .catch(function (err) {
         console.error(`API error getPlaytime for ${steam_id}, ${nickname} : ${err}`);

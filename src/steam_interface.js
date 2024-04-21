@@ -17,7 +17,7 @@ async function isPublicProfile(steamUserId) {
 
 }
 
-async function getAvatars(users) {
+function getAvatars(users) {
   var ids = ""; //list
   users.forEach(user => ids += user.steam_id + ",")
   fetch(
