@@ -29,6 +29,8 @@ There is a variant of this command to display achievements that are locked for t
 Displays number of achievements unlocked history for a specified game
 
 ## Setup
+Add config.json to / and data.json to /src/   (find these files in /ressources)
+
 Add the bot to your discord server
 
 Before starting the bot, you should run deploy-comands.js
