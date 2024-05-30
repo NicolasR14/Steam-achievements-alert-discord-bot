@@ -410,7 +410,10 @@ class Game {
             type: "line",
             data: {
                 labels: all_timestamps,
-                datasets: datasets
+                datasets: datasets.map(dataset => ({
+                    ...dataset,
+                    borderWidth: 3
+                }))
             },
             options: {
                 layout: {
@@ -481,12 +484,10 @@ class Game {
                             },
                             usePointStyle: true,
                             pointStyle: 'line',
-
-                            padding: 20
+                            padding: 20,
                         }
                     }
                 }
-
             }
         };
         const image = await chart.renderToBuffer(configuration);
