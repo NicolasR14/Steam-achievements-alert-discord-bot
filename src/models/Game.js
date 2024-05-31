@@ -17,7 +17,7 @@ class Game {
         this.nbUnlocked = {} //Dictionnaire user steam id avec l'objet user
         this.nbTotal
     }
-    async updateAchievements(user, t_0, start = false) {
+    async updateAchievements(user, last_scan, start = false) {
         return await fetch(`http://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v0001/?appid=${this.id}&key=${API_Steam_key}&steamid=${user.steam_id}&l=${lang}`)
             .then(res => {
                 if (res.ok) {
@@ -48,7 +48,7 @@ class Game {
                     this.achievements[a.apiname].playersUnlockTime[user.steam_id] = a.unlocktime
                     if (a.unlocktime != 0) {
                         nb_unlocked++
-                        if (a.unlocktime > t_0 && !user.displayedAchievements.includes(`${this.id}_${a.apiname}`)) {
+                        if (a.unlocktime > last_scan && !user.displayedAchievements.includes(`${this.id}_${a.apiname}`)) {
                             //achievement is valid if it has been unlocked since bot is live and if it has not been displayed
                             if (!start) {
                                 user.newAchievements.push(this.achievements[a.apiname]);

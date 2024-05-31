@@ -20,8 +20,8 @@ var globalVariables = {
 	'Guilds': [],
 	'Users': [],
 	'Games': [],
-	't_0': parseInt(Date.now() / 1000)
-	// 't_0': parseInt(1698867600)
+	't_lookback': parseInt((Date.now() - 600000) / 1000)
+	// 't_lookback': parseInt(1717037679)
 }
 
 
@@ -37,7 +37,7 @@ client.once(Events.ClientReady, async c => {
 	await Promise.all([await Promise.all(globalVariables.Games.map(async game => {
 		await Promise.all(globalVariables.Users.map(async user => {
 			{
-				await game.updateAchievements(user, globalVariables.t_0, start = true)
+				await game.updateAchievements(user, globalVariables.t_lookback, start = true)
 			}
 		}))
 	})),
