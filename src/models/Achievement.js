@@ -60,8 +60,7 @@ class Achievement {
 
         attachment = new AttachmentBuilder(canvas.toBuffer())
         const unlock_rate = `${this.game.nbUnlocked[author.steam_id].nbUnlocked}/${this.game.nbTotal}`;
-        await guild.channel.send(`<@${author.discord_id}> unlocked an achievement on ${this.game.realName}. Progress : (${unlock_rate})`);
-        await guild.channel.send({ files: [attachment] })
+        await guild.channel.send({ content: `<@${author.discord_id}> unlocked an achievement on ${this.game.realName}. Progress : (${unlock_rate})`, files: [attachment] })
     }
 }
 
