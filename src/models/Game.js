@@ -71,7 +71,7 @@ class Game {
             });
     }
 
-    updateGlobalPercentage() {
+    async updateGlobalPercentage() {
         const id = this.id
         return fetch(`http://api.steampowered.com/ISteamUserStats/GetGlobalAchievementPercentagesForApp/v0002/?gameid=${this.id}&format=json`) //get total players unlocked rate
             .then(res => {
