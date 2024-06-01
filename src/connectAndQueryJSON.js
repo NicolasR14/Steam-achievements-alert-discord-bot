@@ -1,4 +1,3 @@
-const sql = require('mssql');
 const fs = require('node:fs');
 const data_path = 'src/data.json'
 const { User } = require('./models/User')
