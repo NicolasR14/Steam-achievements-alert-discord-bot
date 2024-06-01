@@ -63,7 +63,7 @@ function listenForNewAchievements(globalVariables) {
     if (new_achievements.length > 0) {
       await Promise.all(globalVariables.Games.map(async game => {
         await game.updateGlobalPercentage()
-        await game.getAchievementsIcon()
+        // await game.getAchievementsIcon()
       }))
     }
 
