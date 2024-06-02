@@ -1,21 +1,29 @@
 const { SlashCommandBuilder } = require('discord.js');
 
-function list_players(guildId,users){
-	var to_send = `Players I listen to for new achievements\n`
-	users.forEach(u =>{
-	  if (u.guilds.includes(guildId)){
-		to_send+=`\t<@${u.discord_id}>, SteamID: ${u.steam_id}, Nickname: ${u.nickname}\n`
-	  }
-	})
-	return to_send
+function list_players(guildId, users) {
+
+	var header = 'Players I listen to for new achievements\n'
+	let data = users.filter(u => u.guilds.includes(guildId)).map(u => [u.nickname, u.discord_id, u.steam_id])
+	data = [['Nickname', 'Discord ID', 'Steam ID'], ['', '', ''], ...data]
+	let colWidths = data[0].map((_, colIndex) => {
+		return Math.max(...data.map(row => row[colIndex].length));
+	});
+
+	let formattedLines = data.map(row => {
+		return row.map((item, colIndex) => {
+			return item.padEnd(colWidths[colIndex], ' ');
+		}).join('    ');
+	}).join('\n');
+
+	return `${header}\`\`\`\n${formattedLines}\n\`\`\``
 }
 
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('list_players')
 		.setDescription('Lists the players the bot listens to for new achievements'),
-		
-	async execute(interaction,globalVariables) {
-		await interaction.reply(list_players(interaction.guildId,globalVariables.Users));
+
+	async execute(interaction, globalVariables) {
+		await interaction.reply(list_players(interaction.guildId, globalVariables.Users));
 	},
 };
