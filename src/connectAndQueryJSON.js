@@ -28,7 +28,7 @@ async function getInfosDB(guilds, client) {
 }
 
 
-async function addGameDB(interaction, gameObject, gameIdFound, guildIsIncluded) {
+async function addGameDB(interaction, gameObject) {
 
     try {
         const jsonData = fs.readFileSync(data_path);

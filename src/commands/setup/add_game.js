@@ -24,14 +24,13 @@ module.exports = {
 		if (game_id_valid == 1) {
 			const gameIdFound = globalVariables.Games.find(game => (game.id === game_id))
 			const otherGameNameFound = globalVariables.Games.find(game => (game.id !== game_id) && (game.name === game_name || game.aliases.includes(game_name) || aliases.some(alias => game.aliases.includes(alias) || (game.name == alias))))
-			const guildIsIncluded = gameIdFound.guilds.includes(interaction.guildId)
-
 			if (otherGameNameFound) {
 				await interaction.editReply('Alias/Name already used by other game.');
 				return
 			}
 
 			if (gameIdFound) {
+				const guildIsIncluded = gameIdFound.guilds.includes(interaction.guildId)
 				const aliasesToAdd = [...new Set([game_name, ...aliases].filter(alias => (![gameIdFound.name, ...gameIdFound.aliases].includes(alias)) && alias.trim() !== ''))]
 				console.log(aliasesToAdd)
 				if (!aliasesToAdd.length) {
@@ -52,7 +51,7 @@ module.exports = {
 			}
 			let gameObject = globalVariables.Games.find(game => game.id === game_id);
 
-			addGameDB(interaction, gameObject, gameIdFound, guildIsIncluded);
+			addGameDB(interaction, gameObject);
 
 			globalVariables.Users.map(async user => {
 				await user.getPlaytime(globalVariables.Games);
