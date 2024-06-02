@@ -13,7 +13,7 @@ module.exports = {
 		const game_name = interaction.options.getString('game_name')
 		var find = false
 		for (game of globalVariables.Games) {
-			if (game.name === game_name) {
+			if (game.name === game_name || game.aliases.includes(game_name)) {
 				find = true
 				console.log(`guildId : ${interaction.guildId} ; list : ${game.guilds}`)
 				if (!game.guilds.includes(interaction.guildId)) {
