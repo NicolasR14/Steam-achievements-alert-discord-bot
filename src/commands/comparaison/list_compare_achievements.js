@@ -15,7 +15,7 @@ module.exports = {
 	async execute(interaction, globalVariables) {
 		const user_vs = interaction.options.getUser('player_mention')
 		const game_name = interaction.options.getString('game_name')
-		const gameObject = globalVariables.Games.find(game => game.name === game_name)
+		const gameObject = globalVariables.Games.find(game => game.name === game_name || game.aliases.includes(game_name))
 		if (typeof gameObject === 'undefined') {
 			await interaction.reply('Game not found!');
 			return
