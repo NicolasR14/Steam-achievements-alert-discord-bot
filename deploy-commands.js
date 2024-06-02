@@ -1,7 +1,57 @@
 const { REST, Routes } = require('discord.js');
-const { clientId, guildId, discord_token } = require('./config.json');
 const fs = require('node:fs');
 const path = require('node:path');
+
+function checkIfFileExists(filePath) {
+	try {
+		fs.accessSync(filePath, fs.constants.F_OK);
+		return true;
+	} catch (err) {
+		return false;
+	}
+}
+
+function createJsonFile(filePath, data) {
+	fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+}
+
+const defaultData = {
+	users: {},
+	games: {},
+	guilds: {}
+}
+
+const defaultConfig = {
+	API_Steam_key: "",
+	clientId: "",
+	guildId: "",
+	discord_token: "",
+	lang: "english"
+}
+
+filePath = 'src/data.json'
+if (!checkIfFileExists(filePath)) {
+	createJsonFile(filePath, defaultData);
+	console.log(`${filePath} file created`);
+}
+else {
+	console.log(`${filePath} already existing`);
+}
+filePath = 'config.json'
+if (!checkIfFileExists(filePath)) {
+	createJsonFile(filePath, defaultConfig);
+	console.log(`${filePath} file created, please fill it`);
+	return
+}
+else {
+	console.log(`${filePath} already existing`);
+}
+
+const { clientId, guildId, discord_token } = require('./config.json');
+if (clientId === "" || guildId === "" || discord_token === "") {
+	console.log(`Please fill ./config.json`);
+	return
+}
 
 const commands = [];
 // Grab all the command files from the commands directory you created earlier
