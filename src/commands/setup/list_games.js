@@ -11,7 +11,7 @@ function list_games(guildId, games) {
 	let formattedLines = data.map(row => {
 		return row.map((item, colIndex) => {
 			return item.padEnd(colWidths[colIndex], ' ');
-		}).join('    ');
+		}).join('\t');
 	}).join('\n');
 
 	return `${header}\`\`\`\n${formattedLines}\n\`\`\``

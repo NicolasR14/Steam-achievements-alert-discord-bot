@@ -32,7 +32,6 @@ module.exports = {
 			if (gameIdFound) {
 				const guildIsIncluded = gameIdFound.guilds.includes(interaction.guildId)
 				const aliasesToAdd = [...new Set([game_name, ...aliases].filter(alias => (![gameIdFound.name, ...gameIdFound.aliases].includes(alias)) && alias.trim() !== ''))]
-				console.log(aliasesToAdd)
 				if (!aliasesToAdd.length) {
 					if (guildIsIncluded) {
 						await interaction.editReply('Game already in the list.');
