@@ -4,9 +4,9 @@ const path = require('node:path');
 const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
 const { discord_token } = require('./config.json');
 // const { getGamesAndUsers } = require('./src/connectAndQueryMSSQL.js')
-const { getInfosDB } = require('./src/connectAndQueryJSON')
+const { getInfosDB } = require('./src/connectAndQueryJSON.js')
 const { getAvatars, listenForNewAchievements } = require('./src/steam_interface.js')
-const { Guild } = require('./src/models/Guild')
+const { Guild } = require('./src/models/Guild.js')
 
 
 // Create a new client instance
