@@ -13,7 +13,7 @@ async function getInfosDB(guilds, client) {
             users.push(new User(user.SteamID, DiscordID, user.DiscordNickname, user.Guilds, user.Color))
         })
         Object.entries(data.games).forEach(([AppID, game]) => {
-            games.push(new Game(game.Name, AppID, game.Guilds, game.Aliases || []))
+            games.push(new Game(game.Name, AppID, game.Guilds, game.Aliases || [], game.RealName || ''))
         })
         guilds.forEach((guild) => {
             if (Object.keys(data.guilds).includes(guild.id)) {
@@ -37,7 +37,8 @@ async function addGameDB(interaction, gameObject) {
         data.games[gameObject.id] = {
             "Name": gameObject.name,
             "Guilds": gameObject.guilds,
-            "Aliases": gameObject.aliases
+            "Aliases": gameObject.aliases,
+            "RealName": gameObject.realName
         }
         fs.writeFileSync(data_path, JSON.stringify(data));
         await interaction.editReply('Game added');

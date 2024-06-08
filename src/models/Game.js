@@ -8,11 +8,11 @@ const Canvas = require('canvas');
 require('chartjs-adapter-moment')
 const { ChartJSNodeCanvas } = require('chartjs-node-canvas');
 class Game {
-    constructor(name, id, guilds, aliases) {
+    constructor(name, id, guilds, aliases, realName) {
         this.id = id;
         this.name = name;
         this.aliases = aliases;
-        this.realName = ''
+        this.realName = realName
         this.guilds = guilds;
         this.achievements = {} //Dictionnaire clé id achievements et valeur l'objet de l'achievement
         this.nbUnlocked = {} //Dictionnaire user steam id avec l'objet user

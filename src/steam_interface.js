@@ -98,11 +98,11 @@ async function isGameIdValid(game_id) {
       if (res.ok) {
         return res.json().then((value) => {
           if (!value.game.availableGameStats || !value.game.availableGameStats.achievements || Object.keys(value.game.availableGameStats.achievements).length == 0) {
-            return 0
+            return [0, 0]
           }
-          return 1
+          return [1, value.game.gameName ? value.game.gameName : "No name"]
         })
-      } else return -1
+      } else return [-1, -1]
     })
 }
 

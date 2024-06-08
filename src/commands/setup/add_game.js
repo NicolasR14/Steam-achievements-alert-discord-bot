@@ -20,7 +20,7 @@ module.exports = {
 		const nameOption = interaction.options.getString('name');
 		const [game_name, ...aliases] = nameOption.split(',').map(s => s.trim());
 		await interaction.deferReply()
-		const game_id_valid = await isGameIdValid(game_id)
+		const [game_id_valid, realName] = await isGameIdValid(game_id)
 		if (game_id_valid == 1) {
 			const gameIdFound = globalVariables.Games.find(game => (game.id === game_id))
 			const otherGameNameFound = globalVariables.Games.find(game => (game.id !== game_id) && (game.name === game_name || game.aliases.includes(game_name) || aliases.some(alias => game.aliases.includes(alias) || (game.name == alias))))
@@ -46,7 +46,7 @@ module.exports = {
 
 			}
 			else {
-				globalVariables.Games.push(new Game(game_name, game_id, [interaction.guildId], aliases));
+				globalVariables.Games.push(new Game(game_name, game_id, [interaction.guildId], aliases, realName));
 			}
 			let gameObject = globalVariables.Games.find(game => game.id === game_id);
 
