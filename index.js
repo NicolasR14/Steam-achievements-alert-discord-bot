@@ -29,9 +29,6 @@ client.once(Events.ClientReady, async c => {
 	console.log(`Ready! Logged in as ${c.user.tag}`);
 	globalVariables.Guilds = client.guilds.cache.map(guild => new Guild(guild.id));
 	[globalVariables.Users, globalVariables.Games] = await getInfosDB(globalVariables.Guilds, client);
-	console.table(globalVariables.Users)
-	console.table(globalVariables.Games)
-	console.table(globalVariables.Guilds)
 	getAvatars(globalVariables.Users) //to get avatars for each players
 
 	await Promise.all([await Promise.all(globalVariables.Games.map(async game => {
@@ -40,12 +37,19 @@ client.once(Events.ClientReady, async c => {
 				await game.updateAchievements(user, globalVariables.t_lookback, start = true)
 			}
 		}))
+		if (game.realName == '') {
+			await game.getRealName()
+		}
 	})),
 
 	await Promise.all(globalVariables.Users.map(async user => {
 		await user.getPlaytime(globalVariables.Games)
 	}))
 	])
+
+	console.table(globalVariables.Users)
+	console.table(globalVariables.Games)
+	console.table(globalVariables.Guilds)
 	console.log("Games stats updated")
 
 	listenForNewAchievements(globalVariables);

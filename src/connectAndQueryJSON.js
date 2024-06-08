@@ -13,7 +13,7 @@ async function getInfosDB(guilds, client) {
             users.push(new User(user.SteamID, DiscordID, user.DiscordNickname, user.Guilds, user.Color))
         })
         Object.entries(data.games).forEach(([AppID, game]) => {
-            games.push(new Game(game.Name, AppID, game.Guilds, game.Aliases || [], game.RealName || ''))
+            games.push(new Game(game.Name, AppID, game.Guilds, game.Aliases || []))
         })
         guilds.forEach((guild) => {
             if (Object.keys(data.guilds).includes(guild.id)) {

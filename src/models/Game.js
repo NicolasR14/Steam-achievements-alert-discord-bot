@@ -8,11 +8,11 @@ const Canvas = require('canvas');
 require('chartjs-adapter-moment')
 const { ChartJSNodeCanvas } = require('chartjs-node-canvas');
 class Game {
-    constructor(name, id, guilds, aliases, realName) {
+    constructor(name, id, guilds, aliases) {
         this.id = id;
         this.name = name;
         this.aliases = aliases;
-        this.realName = realName
+        this.realName = ''
         this.guilds = guilds;
         this.achievements = {} //Dictionnaire clé id achievements et valeur l'objet de l'achievement
         this.nbUnlocked = {} //Dictionnaire user steam id avec l'objet user
@@ -93,7 +93,7 @@ class Game {
             });
     }
 
-    getAchievementsIcon() {
+    async getAchievementsIcon() {
         const id = this.id
         const name = this.name
         return fetch(`http://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2/?appid=${this.id}&key=${API_Steam_key}`)
@@ -112,8 +112,27 @@ class Game {
                 }
             })
             .catch(function (err) {
-                console.log(`http://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2/?appid=${id}&key=${API_Steam_key}`)
                 console.error(`getAchievementIcon error for ${id}, ${name} : ${err} `);
+            });
+    }
+
+    async getRealName() {
+        const id = this.id
+        const name = this.name
+        return fetch(`http://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2/?appid=${this.id}&key=${API_Steam_key}`)
+            .then(res => {
+                if (res.ok) {
+                    return res.json();
+                } else {
+                    console.log(res);
+                    throw Error;
+                }
+            })
+            .then(value => {
+                value.game.gameName ? this.realName = value.game.gameName : ''
+            })
+            .catch(function (err) {
+                console.error(`getRealName error for ${id}, ${name} : ${err} `);
             });
     }
 
