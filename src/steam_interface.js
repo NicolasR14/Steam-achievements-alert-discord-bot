@@ -97,7 +97,7 @@ async function isGameIdValid(game_id) {
     .then(res => {
       if (res.ok) {
         return res.json().then((value) => {
-          if ((value.game.availableGameStats.achievements === undefined) || Object.keys(value.game.availableGameStats.achievements).length == 0) {
+          if (!value.game.availableGameStats || !value.game.availableGameStats.achievements || Object.keys(value.game.availableGameStats.achievements).length == 0) {
             return 0
           }
           return 1
