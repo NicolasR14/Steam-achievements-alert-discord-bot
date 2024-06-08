@@ -25,6 +25,10 @@ module.exports = {
 		const steam_id = interaction.options.getString('steam_user_id')
 		const nickname = interaction.options.getString('nickname')
 		var is_new_player = true;
+		if (/^\d+$/.test(steam_id) === false) {
+			await interaction.reply(`Wrong Steam ID`)
+			return
+		}
 		const statusProfile = await isPublicProfile(steam_id)
 		if (statusProfile !== 1) {
 			if (statusProfile === 0) {
