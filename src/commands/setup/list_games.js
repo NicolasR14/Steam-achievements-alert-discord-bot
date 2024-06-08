@@ -16,7 +16,7 @@ function list_games(guildId, games) {
 		row = game.map((item, colIndex) => {
 			return item.padEnd(colWidths[colIndex], ' ');
 		}).join('\t');
-		if ((message + row).length < 1980) {
+		if ((`${message}\n${row}\n\`\`\``).length < 1960) {
 			message += '\n' + row
 		}
 		else {
