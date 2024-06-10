@@ -50,7 +50,8 @@ function listenForNewAchievements(globalVariables) {
 
   setInterval(async function () {
     console.log(`//////////////////////////////\nGames list : ${globalVariables.Games.map(game => game.name)}`)
-    globalVariables.t_lookback = globalVariables.t_lookback + 60000
+    globalVariables.t_lookback = globalVariables.t_lookback + 60
+    console.log(`lookback :${globalVariables.t_lookback}`)
     await Promise.all(globalVariables.Users.map(async user => {
       await user.getRecentlyPlayedGames(globalVariables.Games)
       await Promise.all(user.recentlyPlayedGames.map(async game => {
