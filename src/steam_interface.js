@@ -106,5 +106,12 @@ async function isGameIdValid(game_id) {
       } else return -1
     })
 }
+async function checkForNewUpdates(globalVariables) {
+  setInterval(async function () {
+    globalVariables.Games.forEach(async game => {
+      game.isUpToDate(globalVariables.Guilds)
+    })
+  }, 21600000)
 
-module.exports = { getAvatars, listenForNewAchievements, isPublicProfile, isGameIdValid };
+}
+module.exports = { getAvatars, listenForNewAchievements, isPublicProfile, isGameIdValid, checkForNewUpdates };

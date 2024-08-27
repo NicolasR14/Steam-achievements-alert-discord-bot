@@ -517,5 +517,42 @@ class Game {
         await interaction.editReply({ files: [attachment] })
 
     }
+
+    async isUpToDate(guilds) {
+        return fetch(`http://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2/?appid=${this.id}&key=${API_Steam_key}`)
+            //get infos on game achievements
+            .then(res => {
+                if (res.ok) {
+                    return res.json();
+                } else {
+                    console.log(res);
+                    throw Error;
+                }
+            })
+            .then(value => {
+                if (value.game.gameVersion) {
+                    let gameVersion = parseInt(value.game.gameVersion)
+                    if (this.version) {
+                        if (gameVersion === this.version) {
+                            return
+                        }
+                        else {
+                            this.displayNewUpdateMessage(guilds)
+                        }
+                    }
+                    this.version = parseInt(value.game.gameVersion)
+                    console.log(`${this.id} : saved game version (${this.version})`)
+                }
+            })
+            .catch(function () {
+                console.error(`isUpToDate error for ${this.id}`);
+            });
+    }
+
+    async displayNewUpdateMessage(guilds) {
+        guilds.forEach(guild => {
+            guild.channel.send({ content: `New release available for ${this.realName} !` })
+        });
+    }
 }
 module.exports = { Game }

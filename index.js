@@ -5,7 +5,7 @@ const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
 const { discord_token } = require('./config.json');
 // const { getGamesAndUsers } = require('./src/connectAndQueryMSSQL.js')
 const { getInfosDB } = require('./src/connectAndQueryJSON.js')
-const { getAvatars, listenForNewAchievements } = require('./src/steam_interface.js')
+const { getAvatars, listenForNewAchievements, checkForNewUpdates } = require('./src/steam_interface.js')
 const { Guild } = require('./src/models/Guild.js')
 
 
@@ -53,6 +53,7 @@ client.once(Events.ClientReady, async c => {
 	console.log("Games stats updated")
 
 	listenForNewAchievements(globalVariables);
+	checkForNewUpdates(globalVariables)
 });
 
 // Log in to Discord with your client's token
