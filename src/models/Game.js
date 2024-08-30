@@ -519,7 +519,8 @@ class Game {
     }
 
     async isUpToDate(guilds) {
-        return fetch(`http://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2/?appid=${this.id}&key=${API_Steam_key}`)
+        const id = this.id
+        return fetch(`http://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2/?appid=${id}&key=${API_Steam_key}`)
             //get infos on game achievements
             .then(res => {
                 if (res.ok) {
@@ -541,11 +542,11 @@ class Game {
                         }
                     }
                     this.version = parseInt(value.game.gameVersion)
-                    console.log(`${this.id} : saved game version (${this.version})`)
+                    console.log(`${id} : saved game version (${this.version})`)
                 }
             })
             .catch(function () {
-                console.error(`isUpToDate error for ${this.id}`);
+                console.error(`isUpToDate error for ${id}`);
             });
     }
 
