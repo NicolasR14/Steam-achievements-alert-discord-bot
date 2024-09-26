@@ -551,8 +551,15 @@ class Game {
     }
 
     async displayNewUpdateMessage(guilds) {
+
         guilds.forEach(guild => {
-            guild.channel.send({ content: `New release available for ${this.realName} !` })
+            if (this.guilds.includes(guild.id))
+                try {
+                    guild.channel.send({ content: `New release available for ${this.realName} !` })
+                }
+                catch (err) {
+                    console.log(err)
+                }
         });
     }
 }
