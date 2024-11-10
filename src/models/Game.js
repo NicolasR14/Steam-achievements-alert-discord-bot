@@ -52,7 +52,7 @@ class Game {
                         if (a.unlocktime > last_scan && !user.displayedAchievements.includes(`${this.id}_${a.apiname}`)) {
                             //achievement is valid if it has been unlocked since bot is live and if it has not been displayed
                             if (!start) {
-                                user.newAchievements.push(this.achievements[a.apiname]);
+                                user.newAchievements.push({ object: this.achievements[a.apiname], pos: nb_new_achievements });
                                 nb_new_achievements++
                                 user.displayedAchievements.push(`${this.id}_${a.apiname}`)
                             }

@@ -2,6 +2,15 @@ const Canvas = require('canvas')
 const printAtWordWrap = require('../../assets/utils')
 const { AttachmentBuilder } = require('discord.js');
 
+const gifs = [
+    "https://tenor.com/view/good-job-clapping-obama-gif-12414317449568226158",
+    "https://tenor.com/view/leonardo-dicaprio-clapping-clap-applause-amazing-gif-16078907558888063471",
+    "https://tenor.com/view/congrats-fireworks-gif-6260073604780267354",
+    "https://tenor.com/view/toast-fireworks-celebration-leonardo-di-caprio-cheers-gif-15086880",
+    "https://tenor.com/view/confetti-style-gif-19616552",
+    "https://tenor.com/view/mrandmissjackson-ariana-grande-michael-jackson-gif-20951576"
+];
+
 class Achievement {
     constructor(game, achievementId, achievementName, achievementDescription) {
         this.game = game;
@@ -13,7 +22,7 @@ class Achievement {
         this.icon
     }
 
-    async displayDiscordNewAchievement(Users, guild, author) {
+    async displayDiscordNewAchievement(Users, guild, author, position) {
         Canvas.registerFont('./assets/OpenSans-VariableFont_wdth,wght.ttf', { family: 'Open Sans Regular' })
         const canvas = Canvas.createCanvas(700, 190);
         const context = canvas.getContext('2d');
@@ -59,8 +68,13 @@ class Achievement {
         context.fillText(txt2_2, decal + (index + 1) * 40, 165);
 
         attachment = new AttachmentBuilder(canvas.toBuffer())
-        const unlock_rate = `${this.game.nbUnlocked[author.steam_id].nbUnlocked}/${this.game.nbTotal}`;
-        await guild.channel.send({ content: `<@${author.discord_id}> unlocked an achievement on ${this.game.realName}. Progress : (${unlock_rate})`, files: [attachment] })
+        const unlock_order = this.game.nbUnlocked[author.steam_id].nbUnlocked - position
+        const unlock_rate = unlock_order / this.game.nbTotal * 100;
+        const game_finished = unlock_order === this.game.nbTotal
+        await guild.channel.send({ content: `${game_finished ? '🎉' : ''} <@${author.discord_id}> unlocked an achievement on ${this.game.realName}. Progress : (${unlock_order}/${this.game.nbTotal}) [${unlock_rate.toFixed(2)}%] ${game_finished ? '🎉' : ''}`, files: [attachment] })
+        if (game_finished) {
+            guild.channel.send(gifs[Math.floor(Math.random() * gifs.length)])
+        }
     }
 }
 

@@ -59,7 +59,7 @@ function listenForNewAchievements(globalVariables) {
       }))
     }))
 
-    const new_achievements = globalVariables.Users.map(user => user.newAchievements.map(a => [user, a])).flat(1);
+    const new_achievements = globalVariables.Users.map(user => user.newAchievements.reverse().map(a => [user, a])).flat(1);
     console.log(`Nb new achievements to display : ${new_achievements.length}`)
     if (new_achievements.length > 0) {
       await Promise.all(globalVariables.Games.map(async game => {
@@ -80,8 +80,8 @@ function listenForNewAchievements(globalVariables) {
           continue;
         }
 
-        if (newA[1].game.guilds.includes(guild_id)) {
-          await newA[1].displayDiscordNewAchievement(globalVariables.Users, guild, newA[0])
+        if (newA[1].object.game.guilds.includes(guild_id)) {
+          await newA[1].object.displayDiscordNewAchievement(globalVariables.Users, guild, newA[0], newA[1].pos)
         }
       }
     }
